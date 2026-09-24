@@ -16,7 +16,7 @@ On first activation the theme:
 - creates the pages **Home**, **Products**, **The Brand** (`/brand/`) and **Contact**, and sets Home
   as the front page;
 - switches to pretty URLs (`/products/` rather than `?page_id=2`) if none are set;
-- adds the four launch products (Grove, Bark, Heartwood, Edge) if there are no products yet.
+- adds the seven launch products (Grove, Ridge, Ledge, Sapling, Cedar, Aspen, Lattice) if there are no products yet.
 
 It never overwrites pages or products that already exist.
 

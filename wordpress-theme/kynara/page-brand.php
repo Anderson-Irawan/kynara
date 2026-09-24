@@ -9,7 +9,7 @@ get_header();
 		<section class="brand-intro">
 			<div class="wrap">
 				<h1 class="brand-intro__title" data-i18n-html="brand.intro.title">Sustainable composites for<br>floors, walls and structures</h1>
-				<div class="img-box brand-intro__media"><img src="<?php echo esc_url( kynara_asset( 'images/brand-banner.webp' ) ); ?>" alt="A couple dancing on a sunlit forest path beside a bicycle" fetchpriority="high"></div>
+				<div class="img-box img-box--parallax brand-intro__media"><img src="<?php echo esc_url( kynara_asset( 'images/brand-banner.webp' ) ); ?>" alt="A couple dancing on a sunlit forest path beside a bicycle" fetchpriority="high"></div>
 			</div>
 		</section>
 
@@ -23,11 +23,11 @@ get_header();
 							<p data-i18n="brand.craft.b">Imperdiet possimus esse molestias deleniti sit tempore cumque sunt. Velit adipiscing quis eiusmod possimus laboris mollit aute in est laborum id lorem. Sint ea soluta est et possimus id consectetur.</p>
 						</div>
 					</div>
-					<div class="img-box"><img src="<?php echo esc_url( kynara_asset( 'images/meeting-with-forest.webp' ) ); ?>" alt="Meeting table beneath an opening to the forest" loading="lazy"></div>
+					<div class="img-box img-box--parallax"><img src="<?php echo esc_url( kynara_asset( 'images/meeting-with-forest.webp' ) ); ?>" alt="Meeting table beneath an opening to the forest" loading="lazy"></div>
 				</section>
 
 				<section class="feature feature--reverse" id="sustainability">
-					<div class="img-box"><img src="<?php echo esc_url( kynara_asset( 'images/cosmos_789092184.webp' ) ); ?>" alt="Person reading on a leather sofa surrounded by plants" loading="lazy"></div>
+					<div class="img-box img-box--parallax"><img src="<?php echo esc_url( kynara_asset( 'images/cosmos_789092184.webp' ) ); ?>" alt="Person reading on a leather sofa surrounded by plants" loading="lazy"></div>
 					<div class="feature__text">
 						<div>
 							<h2 class="feature__title" data-i18n-html="brand.sustain.title">The Sustainable<br>Alternatives</h2>
@@ -53,7 +53,7 @@ get_header();
 							<p data-i18n="brand.apps.b">Imperdiet possimus esse molestias deleniti sit tempore cumque sunt. Velit adipiscing quis eiusmod possimus laboris mollit aute in est laborum id lorem. Sint ea soluta est et possimus id consectetur.</p>
 						</div>
 					</div>
-					<div class="img-box"><img src="<?php echo esc_url( kynara_asset( 'images/cosmos_969656075.webp' ) ); ?>" alt="Person resting beneath a moss-covered tree sculpture" loading="lazy"></div>
+					<div class="img-box img-box--parallax"><img src="<?php echo esc_url( kynara_asset( 'images/cosmos_969656075.webp' ) ); ?>" alt="Person resting beneath a moss-covered tree sculpture" loading="lazy"></div>
 				</section>
 			</div>
 		</div>

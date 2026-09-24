@@ -124,7 +124,8 @@ html.lenis, html.lenis body { height: auto; }
 
 /* ---------- Every place Candara is used, tracked in by 4% ---------- */
 .hero__title, .section-title, .story h2, .product-card__name, .product-card__use,
-.feature__title, .stat__value, .contact__title, .subscribe h2, .brand-intro__title {
+.feature__title, .stat__value, .contact__title, .subscribe h2, .brand-intro__title,
+.product-tile__num, .product-tile__name {
   letter-spacing: var(--tracking-display);
 }
 
@@ -133,6 +134,14 @@ html.lenis, html.lenis body { height: auto; }
 /* Videos obey the same rule: the box sets the size, the video fills it (style rule 2) */
 .img-box > img,
 .img-box > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* In-frame parallax (The Brand, style rule 1): the frame stays put and the photo
+   drifts inside it. The photo is 120% of the frame's height, starting 10% above it,
+   so main.js can move it +/-10% of the frame without ever exposing an edge. Only
+   under no-preference; with JS off the photo just sits slightly cropped. */
+@media (prefers-reduced-motion: no-preference) {
+  .img-box--parallax > img { inset: -10% 0 auto; height: 120%; will-change: transform; }
+}
 
 /* ==========================================================================
    Header
@@ -143,20 +152,7 @@ html.lenis, html.lenis body { height: auto; }
    under it and shifts the scroll position - enough to flip the threshold back and
    forth. Here the light-header pages reserve the full height with a margin on
    <main>, so the bar can get shorter without anything else moving. */
-.site-header {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
-  /* coming back: settles in on the entrance curve */
-  transition: transform var(--shrink-ms) var(--ui-enter), opacity var(--shrink-ms) var(--ui-enter);
-}
-/* At the footer the header slides up out of the way (main.js sets .is-hidden).
-   Leaving uses the exit curve and is quicker. :focus-within brings it straight back
-   if someone tabs into the nav, so keyboard users can never lose it. */
-.site-header.is-hidden:not(:focus-within) {
-  transform: translateY(-100%);
-  opacity: 0;
-  pointer-events: none;
-  transition: transform var(--ui-panel-ms) var(--ui-exit), opacity var(--ui-panel-ms) var(--ui-exit);
-}
+.site-header { position: fixed; top: 0; left: 0; right: 0; z-index: 20; }
 .site-header--light + main { margin-top: var(--header-h); }
 .site-header.is-scrolled { --bar-h: var(--header-h-small); }
 
@@ -345,7 +341,7 @@ html.lenis, html.lenis body { height: auto; }
 .subscribe__field button,
 .footer-cols a,
 .footer-bottom a,
-.collection__item h3 {
+.collection__all {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-decoration-color: transparent;
@@ -363,7 +359,7 @@ html.lenis, html.lenis body { height: auto; }
 .subscribe__field button:hover,
 .footer-cols a:hover,
 .footer-bottom a:hover,
-.collection__item a:hover h3 {        /* the whole product card is the link; its name answers */
+.collection__all:hover {
   text-decoration-color: currentColor;
   text-underline-offset: 3px;
 }
@@ -548,14 +544,15 @@ html.lenis, html.lenis body { height: auto; }
 .roller__word[data-pos="0"] { opacity: 1; }
 .roller.no-transition, .roller__word.no-transition { transition: none; }
 @media (prefers-reduced-motion: reduce) {
+  .story__card { transform: none; }
+  .story.is-armed .story__card { opacity: 1; translate: none; rotate: none; scale: none; }
   .roller, .roller__word,
   .search-panel, .search-panel.is-open,
   .site-header--overlay .site-header__bar,
   .site-header__bar::after,
   .main-nav a, .search-toggle, .menu-toggle, .lang-switch__toggle, .lang-switch__menu button,
   .btn-bracket, .subscribe__field button, .footer-cols a, .footer-bottom a,
-  .collection__item h3, .brand-logo::before, .circle-btn, .chat-fab,
-  .site-header, .site-header.is-hidden:not(:focus-within),
+  .product-tile__arrow, .collection__all, .story__arrow, .story__card, .brand-logo::before, .circle-btn, .chat-fab, .chat-fab__label,
   .site-header__bar, .brand-logo, .site-header .brand-logo::after,
   .site-header--overlay.is-search-closing .site-header__bar,
   .site-header.is-search-closing .site-header__bar::after { transition: none; }
@@ -567,19 +564,58 @@ html.lenis, html.lenis body { height: auto; }
 .home-green { background: var(--green); color: var(--cream); padding: 146px 0 68px; overflow: hidden; }
 .section-title { font-family: var(--font-display); font-weight: 400; font-size: var(--t3); line-height: 1.15; }
 
+/* Title with "See all" on the same line, right-aligned. Baseline-aligned so the
+   small DM Sans link sits on the Candara title's text line, not its box centre. */
+.collection__head { display: flex; justify-content: space-between; align-items: baseline; gap: 24px; }
+.collection__all { font-size: var(--t5); line-height: 1; flex: none; }
+
 .collection__track {
+  --card-w: 422px;
+  --end-slot: 2;   /* the last card stops in this slot from the left (1 on phones) */
   display: flex; gap: 34px;
   margin-top: 22px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
-  margin-right: calc(var(--page-pad) * -1 - 200px); /* lets the third card bleed off the edge, as drawn */
-  padding-right: 200px;
+  margin-right: calc(var(--page-pad) * -1); /* runs to the screen edge, so the third card bleeds off it, as drawn */
 }
 .collection__track::-webkit-scrollbar { display: none; }
-.collection__item { flex: 0 0 422px; scroll-snap-align: start; }
+.collection__item { flex: 0 0 var(--card-w); scroll-snap-align: start; display: flex; }
+/* End spacer: without it the track stops as soon as the last card is fully in view,
+   leaving it stranded on the right. This makes the last scroll stop leave the last card
+   in slot --end-slot from the left (2 = one card before it), at any width. 100% is the
+   track's width here, so it's the track minus that many card+gap steps.
+   A pseudo-element rather than padding-right: trailing padding in a scrolling flex row
+   has been unreliable in some browsers. */
+.collection__track::after { content: ""; flex: 0 0 max(0px, calc(100% - var(--end-slot) * (var(--card-w) + 34px))); }
 .collection__item .img-box { aspect-ratio: 422 / 402; }
-.collection__item h3 { font-family: var(--font-body); font-weight: 700; font-size: var(--t5); margin-top: 42px; }
+/* Each product is a spec-sheet card (after Anderson's "001. stack" reference): number
+   and name above a rule, the photo edge to edge, the Use row (when there is one) with
+   a rule under it, then the arrow. The whole card is the link; no underline. Hover
+   nudges the arrow the way it points - no lift. Cards stretch to the tallest, so the
+   arrows line up even when a card has no Use row. */
+.product-tile {
+  flex: 1; display: flex; flex-direction: column; background: var(--cream); color: var(--ink);
+  border-radius: 46px; overflow: hidden;   /* same rounding as the Products page cards (32px on phones) */
+}
+.product-tile__head {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  padding: 30px 34px 20px; border-bottom: 1px solid var(--ink);   /* clear of the rounded corners */
+}
+.product-tile__num, .product-tile__name { font-family: var(--font-display); font-size: var(--t3); line-height: 1; }
+.product-tile__num { font-weight: 400; }
+.product-tile__name { font-weight: 700; }
+.product-tile .img-box { border-bottom: 1px solid var(--ink); }   /* the rule under the photo, on every card */
+.product-tile__specs > div {
+  display: flex; justify-content: space-between; gap: 16px;
+  padding: 10px 34px; border-bottom: 1px solid var(--ink);
+  font-size: var(--t6); line-height: 1.3;
+}
+.product-tile__specs dd { text-align: right; }
+.product-tile__foot { display: flex; justify-content: flex-end; margin-top: auto; padding: 20px 34px 30px; }
+.product-tile__arrow { width: 28px; height: 28px; transition: translate var(--hover-ms) var(--ui-enter); }
+.product-tile:hover .product-tile__arrow { translate: 3px -3px; }
+.product-tile:focus-visible { outline: 1px solid var(--cream); outline-offset: 4px; }   /* follows the rounding */   /* on the green section */
 .collection__controls { display: flex; justify-content: flex-end; margin-top: 18px; }
 
 .circle-btn {
@@ -590,16 +626,60 @@ html.lenis, html.lenis body { height: auto; }
 }
 .circle-btn svg { width: 22px; height: 22px; }
 
-.story { position: relative; display: grid; grid-template-columns: 42.5% 15% 42.5%; grid-template-rows: auto auto 1fr; }
-.story__brown-bg { grid-column: 1 / 3; grid-row: 1 / 3; background: var(--brown); }
-.story__brown-head { grid-column: 1 / 3; grid-row: 1; padding: 55px 55px 30px; }
-.story__brown-media { grid-column: 1 / 3; grid-row: 2; padding: 14px 55px 55px; }
+/* The collage is 85% of the container, centred - Anderson asked for it 15% smaller.
+   Widths, photos (aspect-ratio boxes) and spacing all scale; the type stays on its
+   tiers (style rule 4), and the circle button keeps its size. */
+.story { position: relative; display: grid; grid-template-columns: 42.5% 15% 42.5%; grid-template-rows: auto auto 1fr;
+  width: 85%; margin-left: auto; margin-right: auto; }
+/* The brown card spans the story grid's first two rows and passes them down with
+   subgrid, so its image row is the same row the red card starts on. z-index 0 makes
+   it its own layer, under the red card (1). */
+.story__card--brown {
+  grid-column: 1 / 3; grid-row: 1 / 3;
+  display: grid; grid-template-rows: subgrid;
+  background: var(--brown); position: relative; z-index: 0;
+}
+.story__brown-head { grid-row: 1; padding: 47px 47px 26px; }
+.story__brown-media { grid-row: 2; padding: 12px 47px 47px; }
 .story__brown-media .img-box { aspect-ratio: 557 / 562; }
-.story__card--red { grid-column: 2 / 4; grid-row: 2 / 4; background: var(--rust); position: relative; z-index: 1; padding: 55px; }
+.story__card--red { grid-column: 2 / 4; grid-row: 2 / 4; background: var(--rust); position: relative; z-index: 1; padding: 47px; }
 .story h2 { font-family: var(--font-display); font-weight: 400; font-size: var(--t3); line-height: 1.12; }
 .story p { font-size: var(--t6); line-height: 1.3; margin-top: 28px; max-width: 560px; }
-.story__card--red .img-box { aspect-ratio: 556 / 670; margin-top: 44px; }
+.story__card--red .img-box { aspect-ratio: 556 / 670; margin-top: 37px; }
 .story__link { grid-column: 1; grid-row: 3; align-self: start; margin-top: 42px; }
+/* Whole card is the link: the heading's <a> is stretched over its card, and
+   keyboard focus rings the whole card. No underline - the arrow, the tilt and the
+   cursor say it's clickable. */
+.story__hit { color: inherit; text-decoration: none; }
+.story__hit::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.story__hit:focus-visible { outline: none; }
+.story__hit:focus-visible::after { outline: 1px solid currentColor; outline-offset: 4px; }
+/* Squared 45-degree arrow, top right of each card: the head's two arms are about as
+   long as the tail. It nudges 3px the way it points when the card is hovered. */
+.story__arrow {
+  position: absolute; top: 47px; right: 47px; z-index: 2;
+  width: 32px; height: 32px; pointer-events: none;
+  transition: translate var(--hover-ms) var(--ui-enter);
+}
+.story__card:hover .story__arrow { translate: 3px -3px; }
+.story__brown-head, .story__card--red > h2 { padding-right: 48px; }   /* titles clear the arrow */
+/* Tilt (style rule 1): main.js eases --rx / --ry toward the pointer, 2.5deg at most */
+.story__card { transform: perspective(1600px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); }
+/* Landing (style rule 1): once the story is 25% on screen the cards are "laid down",
+   brown from the left, rust from the right a beat later. main.js adds .is-armed (hidden,
+   offset, rotated, slightly large) and then .is-in. It uses the individual translate /
+   rotate / scale properties, which compose with the tilt's transform instead of
+   overwriting it. Without JS nothing is armed, so the cards simply show. */
+.story.is-armed .story__card { opacity: 0; }
+.story.is-armed .story__card--brown { translate: -70px 90px; rotate: -7deg; scale: 1.06; }
+.story.is-armed .story__card--red { translate: 80px 110px; rotate: 6deg; scale: 1.06; }
+.story.is-armed.is-in .story__card {
+  opacity: 1; translate: 0 0; rotate: 0deg; scale: 1;
+  transition:
+    opacity 260ms var(--ui-enter),
+    translate 720ms var(--ui-enter), rotate 720ms var(--ui-enter), scale 720ms var(--ui-enter);
+}
+.story.is-armed.is-in .story__card--red { transition-delay: 130ms; }
 
 /* ==========================================================================
    Products page
@@ -725,12 +805,17 @@ html.lenis, html.lenis body { height: auto; }
    Solid green with a cream icon so it reads over the video and the cream pages.
    The 1px cream ring disappears on cream but gives it an edge over the green Home
    section, where green on green would otherwise vanish. No shadow (style rule 1).
-   Hover inverts it, on the same eased curve as every other hover.
+   A rounded square that, on hover (or keyboard focus), grows to the left into a
+   rounded rectangle reading "Request a quote or get in touch", inverting to cream.
+   How: the label's width animates from 0 to the text's width (measured by main.js
+   into --fab-label-w, section 12), so the button's own border draws the outline at
+   every frame. The button is fixed, so the width change reflows nothing else.
    ========================================================================== */
 .chat-fab {
+  --fab: 64px;
   position: fixed; right: 32px; bottom: 32px; z-index: 15;   /* under the header (20) */
-  display: flex; align-items: center; justify-content: center;
-  width: 64px; height: 64px; border-radius: 50%;
+  display: flex; align-items: center;
+  height: var(--fab); border-radius: 100px;
   background-color: var(--green); color: var(--cream);
   border: 1px solid var(--cream);
   transition:
@@ -738,11 +823,35 @@ html.lenis, html.lenis body { height: auto; }
     color var(--hover-ms) var(--ui-enter),
     border-color var(--hover-ms) var(--ui-enter);
 }
-.chat-fab svg { width: 26px; height: 26px; display: block; }
-.chat-fab:hover { background-color: var(--cream); color: var(--green); border-color: var(--green); }
-/* The site's focus ring uses currentColor, which is cream here and would vanish on
-   the cream pages - so this one is drawn in ink */
-.chat-fab:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
+.chat-fab__label {
+  display: flex; justify-content: flex-end;   /* text pinned to the right edge: it stays */
+  width: 0; overflow: hidden;                 /* still while the bubble slides off it */
+  transition: width var(--ui-panel-ms) var(--ui-enter);
+}
+.chat-fab__text {
+  flex: none; padding-right: calc((var(--fab) - 28px) / 2);   /* matches the icon's left margin */
+  white-space: nowrap;
+  font-family: var(--font-body); font-size: var(--t6); line-height: 1;
+}
+/* Centred in the closed square: (size - 2px border - 26px icon) / 2 each side.
+   First in the row, so it rides out with the left edge as the button opens and
+   ends up to the left of the text. */
+.chat-fab svg {
+  order: -1; flex: none; display: block; width: 26px; height: 26px;
+  margin: 0 calc((var(--fab) - 28px) / 2);
+}
+/* Touch screens don't get the hover version: a tap should just go to Contact */
+@media (hover: hover) {
+  .chat-fab:hover { background-color: var(--cream); color: var(--green); border-color: var(--green); }
+  .chat-fab:hover .chat-fab__label { width: var(--fab-label-w, auto); }
+}
+/* The site's focus ring uses currentColor, which could vanish against the cream
+   pages - so this one is drawn in ink */
+.chat-fab:focus-visible {
+  background-color: var(--cream); color: var(--green); border-color: var(--green);
+  outline: 1px solid var(--ink); outline-offset: 4px;
+}
+.chat-fab:focus-visible .chat-fab__label { width: var(--fab-label-w, auto); }
 
 /* ==========================================================================
    Responsive
@@ -756,7 +865,7 @@ html.lenis, html.lenis body { height: auto; }
 }
 
 @media (max-width: 900px) {
-  .chat-fab { right: 20px; bottom: 20px; width: 56px; height: 56px; }
+  .chat-fab { --fab: 56px; right: 20px; bottom: 20px; }
   .brand-intro { padding: 56px 0 40px; }
   .brand-intro__media { aspect-ratio: 4 / 3; margin-top: 32px; }
   :root { --header-h: 88px; --header-h-small: 60px; --page-pad: 32px; }
@@ -779,15 +888,16 @@ html.lenis, html.lenis body { height: auto; }
   .hero .roller { display: block; margin: .15em 0; } /* own line on phones; the neighbours are hidden now, so it needs no room for them */
 
   .home-green { padding-top: 80px; }
-  .collection__item { flex-basis: 78%; }
-  .story { grid-template-columns: 1fr; }
+  .collection__track { --card-w: 78%; --end-slot: 1; }
+  .product-tile { border-radius: 32px; }   /* ~1 card per screen: end on the left */
+  .story { grid-template-columns: 1fr; width: auto; }   /* phones: full width again */
   .story { grid-template-rows: none; }
-  .story__brown-bg { display: none; }
-  .story__brown-head, .story__brown-media, .story__card--red, .story__link { grid-column: 1; grid-row: auto; }
-  .story__brown-head, .story__brown-media { background: var(--brown); }
+  .story__card--brown { display: block; }
+  .story__card--brown, .story__card--red, .story__link { grid-column: 1; grid-row: auto; }
   .story__brown-head { padding: 32px 24px 24px; }
   .story__brown-media { padding: 0 24px 32px; }
   .story__card--red { padding: 32px 24px; }
+  .story__arrow { top: 32px; right: 24px; width: 28px; height: 28px; }
 
   .product-card { grid-template-columns: 1fr; gap: 24px; padding: 24px; border-radius: 32px; }
   .product-card .img-box { aspect-ratio: 4 / 3; }

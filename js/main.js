@@ -234,10 +234,13 @@
   }
 
   var SEARCH_INDEX = [
-    { href: 'products.html#floor', title: 'FLOOR', key: 'product.floor.use' },
-    { href: 'products.html#bark', title: 'BARK', key: 'product.bark.use' },
-    { href: 'products.html#heartwood', title: 'HEARTWOOD', key: 'product.heartwood.use' },
-    { href: 'products.html#edge', title: 'EDGE', key: 'product.edge.use' },
+    { href: 'products.html#grove', title: 'GROVE', key: 'product.grove.use' },
+    { href: 'products.html#ridge', title: 'RIDGE', key: 'product.ridge.use' },
+    { href: 'products.html#ledge', title: 'LEDGE', key: 'product.ledge.use' },
+    { href: 'products.html#sapling', title: 'SAPLING', key: 'product.sapling.use' },
+    { href: 'products.html#cedar', title: 'CEDAR' },
+    { href: 'products.html#aspen', title: 'ASPEN' },
+    { href: 'products.html#lattice', title: 'LATTICE' },
     { href: 'products.html', key: 'nav.products' },
     { href: 'brand.html', key: 'nav.brand' },
     { href: 'brand.html#craftsmanship', key: 'footer.craft' },
@@ -271,7 +274,7 @@
       var parts = item.href.split('#');
       a.href = parts[0] + langSuffix + (parts[1] ? '#' + parts[1] : '');
       a.textContent = item.title || t(item.key);
-      if (item.title) {
+      if (item.title && item.key) {
         var s = document.createElement('span');
         s.textContent = t(item.key);
         a.appendChild(s);
@@ -461,21 +464,13 @@
   // cream surface on the hero pages, and the logo retracts to the logomark.
   // The header is position:fixed with its full height reserved in the CSS, so the
   // class change never moves the page and cannot bounce the threshold.
-  // Once the footer is well on screen the header slides away (.is-hidden) and comes
-  // back as you scroll up out of the footer. Guards:
-  // - only after scrolling: on a short page (Contact) the footer can be visible at
-  //   the very top, and the header must not vanish there;
-  // - never while the search panel is open;
-  // - the CSS brings it back on :focus-within, so keyboard users never lose it.
-  var siteFooter = document.querySelector('.site-footer');
+  // It stays on screen all the way down, footer included (it used to slide away at
+  // the footer; Anderson asked for it to stay).
   if (siteHeader) {
     var headerQueued = false;
     var placeHeader = function () {
       var scrolled = window.pageYOffset > 40;
       siteHeader.classList.toggle('is-scrolled', scrolled);
-      var atFooter = !!siteFooter && siteFooter.getBoundingClientRect().top < window.innerHeight * 0.7;
-      siteHeader.classList.toggle('is-hidden',
-        scrolled && atFooter && !siteHeader.classList.contains('is-search-open'));
       headerQueued = false;
     };
     window.addEventListener('scroll', function () {
@@ -613,6 +608,103 @@
         el.textContent = countText(el, parseFloat(el.getAttribute('data-count-from') || '0'));
       });
       statsObserver.observe(group);
+    });
+  }
+
+  /* ---------- 12. Contact button label ---------- */
+  // The button opens by animating the label's width from 0 to the text's own
+  // width. CSS can't animate to "auto", so the width is measured here into
+  // --fab-label-w, and re-measured whenever the text's size changes (language
+  // switch, web font arriving). Without JS the CSS falls back to auto: it still
+  // opens to the right size, just without the animation.
+  var fabText = document.querySelector('.chat-fab__text');
+  if (fabText) {
+    var fabButton = fabText.closest('.chat-fab');
+    var measureFab = function () {
+      fabButton.style.setProperty('--fab-label-w', fabText.offsetWidth + 'px');
+    };
+    measureFab();
+    if ('ResizeObserver' in window) new ResizeObserver(measureFab).observe(fabText);
+  }
+
+  /* ---------- 13. Image parallax (The Brand) ---------- */
+  // Every .img-box--parallax photo drifts inside its frame as the frame crosses the
+  // screen. Progress p runs from 1 (frame entering at the bottom) to -1 (leaving at
+  // the top) and the photo moves -p * 10% of the frame's height - exactly the slack
+  // the CSS leaves - so it scrolls a little slower than the page. All frames are
+  // measured first and written after, so a frame never forces an extra layout;
+  // off-screen frames are skipped.
+  var pxBoxes = Array.prototype.slice.call(document.querySelectorAll('.img-box--parallax'));
+  if (pxBoxes.length && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    var pxQueued = false;
+    var placeImages = function () {
+      var vh = window.innerHeight;
+      var rects = pxBoxes.map(function (box) { return box.getBoundingClientRect(); });
+      pxBoxes.forEach(function (box, i) {
+        var r = rects[i];
+        if (r.bottom < 0 || r.top > vh) return;
+        var p = (r.top + r.height / 2 - vh / 2) / ((vh + r.height) / 2);
+        p = Math.max(-1, Math.min(1, p));
+        box.firstElementChild.style.transform =
+          'translate3d(0,' + (-p * r.height * 0.1).toFixed(1) + 'px,0)';
+      });
+      pxQueued = false;
+    };
+    var queueImages = function () {
+      if (pxQueued) return;
+      pxQueued = true;
+      window.requestAnimationFrame(placeImages);
+    };
+    window.addEventListener('scroll', queueImages, { passive: true });
+    window.addEventListener('resize', queueImages);
+    window.addEventListener('load', queueImages);   // images and fonts can move the frames
+    placeImages();
+  }
+
+  /* ---------- 14. Story cards: landing + tilt (Home) ---------- */
+  // Landing: the cards are hidden (.is-armed) and "laid down" (.is-in) once the story
+  // is a quarter on screen - once only. Tilt: each card leans up to 2.5deg toward the
+  // pointer, eased 7% per frame, and settles flat when it leaves. The card is measured
+  // once as the pointer enters (and again after a scroll): a tilted card's outline
+  // changes as it tilts, so measuring on every move fed the tilt back into itself and
+  // jittered. Both are skipped under reduced motion; touch gets no tilt.
+  var storyEl = document.querySelector('.story');
+  if (storyEl && 'IntersectionObserver' in window &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    storyEl.classList.add('is-armed');
+    var storyObserver = new IntersectionObserver(function (entries) {
+      if (!entries[0].isIntersecting) return;
+      storyEl.classList.add('is-in');
+      storyObserver.disconnect();
+    }, { threshold: 0.25 });
+    storyObserver.observe(storyEl);
+
+    var TILT = 2.5;
+    storyEl.querySelectorAll('.story__card').forEach(function (card) {
+      var tx = 0, ty = 0, cx = 0, cy = 0, tilting = false, box = null;
+      var stepTilt = function () {
+        cx += (tx - cx) * 0.07;
+        cy += (ty - cy) * 0.07;
+        card.style.setProperty('--rx', cy.toFixed(2) + 'deg');
+        card.style.setProperty('--ry', cx.toFixed(2) + 'deg');
+        if (Math.abs(tx - cx) > 0.005 || Math.abs(ty - cy) > 0.005) window.requestAnimationFrame(stepTilt);
+        else tilting = false;
+      };
+      var startTilt = function () {
+        if (tilting) return;
+        tilting = true;
+        window.requestAnimationFrame(stepTilt);
+      };
+      card.addEventListener('pointerenter', function () { box = card.getBoundingClientRect(); });
+      window.addEventListener('scroll', function () { box = null; }, { passive: true });
+      card.addEventListener('pointermove', function (e) {
+        if (e.pointerType === 'touch') return;
+        var r = box || (box = card.getBoundingClientRect());
+        tx = ((e.clientX - r.left) / r.width - 0.5) * 2 * TILT;      // left/right -> rotateY
+        ty = -((e.clientY - r.top) / r.height - 0.5) * 2 * TILT;     // up/down -> rotateX
+        startTilt();
+      });
+      card.addEventListener('pointerleave', function () { tx = 0; ty = 0; startTilt(); });
     });
   }
 

@@ -22,7 +22,7 @@
       'meta.title.contact': 'Contact | KYNARA',
       /* Page descriptions: also written into each page's <meta name="description">. Keep both in sync. */
       'meta.desc.home': 'KYNARA makes premium wood-plastic composite from rice husk and recycled plastic: decking, cladding, posts and beams crafted for harmonious living.',
-      'meta.desc.products': 'Explore the KYNARA collection: FLOOR decking, BARK cladding and wall panels, HEARTWOOD posts and beams, and EDGE corner trims.',
+      'meta.desc.products': 'Explore the KYNARA collection of sustainable wood-plastic composite: Grove, Ridge, Ledge, Sapling, Cedar, Aspen and Lattice, for floors, walls and structures.',
       'meta.desc.brand': 'KYNARA blends rice husk from local farms with post-consumer recycled plastic: a sustainable alternative to timber, built for limitless applications.',
       'meta.desc.contact': 'Enquire about KYNARA wood-plastic composite products. Tell us about your project and our team will be in touch.',
 
@@ -34,7 +34,7 @@
       'nav.search': 'SEARCH',
       'nav.home': 'KYNARA home',
       'nav.language': 'Change language',
-      'fab.contact': 'Contact us',
+      'fab.label': 'Request a quote or get in touch',
       'search.label': 'Search the site',
       'search.placeholder': 'Search products and pages',
       'search.none': 'No results',
@@ -45,6 +45,7 @@
 
       /* Home */
       'home.collection': 'Explore Our Collection',
+      'home.seeAll': 'See all',
       'home.next': 'Next product',
       'home.craft.title': 'Layers of Craftsmanship',
       'home.craft.body': LOREM_LONG,
@@ -53,12 +54,13 @@
       'home.learn': 'Learn about<br>The Brand',
 
       /* Products */
-      'product.floor.use': 'Cladding',
-      'product.bark.use': 'Cladding | Wall Panels | Ceiling',
-      'product.heartwood.use': 'Posts | Beams',
-      'product.edge.use': 'Close corners',
+      'product.grove.use': 'Cladding',
+      'product.ridge.use': 'Cladding | Wall Panels | Ceiling',
+      'product.ledge.use': 'Posts | Beams',
+      'product.sapling.use': 'Close corners',
       'product.measurements': 'Measurements',
       'product.colors': 'Color variants',
+      'product.card.use': 'Use',
 
       /* The Brand */
       'brand.intro.title': 'Sustainable composites for<br>floors, walls and structures',
@@ -116,7 +118,7 @@
       'meta.title.brand': 'Tentang Merek | KYNARA',
       'meta.title.contact': 'Kontak | KYNARA',
       'meta.desc.home': 'KYNARA memproduksi komposit kayu-plastik premium dari sekam padi dan plastik daur ulang: lantai dek, pelapis dinding, tiang, dan balok untuk hunian yang harmonis.',
-      'meta.desc.products': 'Jelajahi koleksi KYNARA: lantai dek FLOOR, pelapis dan panel dinding BARK, tiang dan balok HEARTWOOD, serta penutup sudut EDGE.',
+      'meta.desc.products': 'Jelajahi koleksi komposit kayu-plastik berkelanjutan KYNARA: Grove, Ridge, Ledge, Sapling, Cedar, Aspen, dan Lattice, untuk lantai, dinding, dan struktur.',
       'meta.desc.brand': 'KYNARA memadukan sekam padi dari petani lokal dengan plastik daur ulang pascakonsumen: alternatif kayu yang berkelanjutan untuk penerapan tanpa batas.',
       'meta.desc.contact': 'Ajukan pertanyaan tentang produk komposit kayu-plastik KYNARA. Ceritakan proyek Anda dan tim kami akan segera menghubungi Anda.',
 
@@ -127,7 +129,7 @@
       'nav.search': 'CARI',
       'nav.home': 'Beranda KYNARA',
       'nav.language': 'Ganti bahasa',
-      'fab.contact': 'Hubungi kami',
+      'fab.label': 'Minta penawaran atau hubungi kami',
       'search.label': 'Cari di situs',
       'search.placeholder': 'Cari produk dan halaman',
       'search.none': 'Tidak ada hasil',
@@ -136,6 +138,7 @@
       'hero.static': 'Crafted for Harmonious Living',
 
       'home.collection': 'Jelajahi Koleksi Kami',
+      'home.seeAll': 'Lihat semua',
       'home.next': 'Produk berikutnya',
       'home.craft.title': 'Lapisan Keahlian',
       'home.craft.body': LOREM_LONG,
@@ -143,12 +146,13 @@
       'home.forest.body': LOREM_LONG,
       'home.learn': 'Kenali<br>Merek Kami',
 
-      'product.floor.use': 'Pelapis Dinding',   /* matches BARK's wording; review */
-      'product.bark.use': 'Pelapis Dinding | Panel Dinding | Plafon',
-      'product.heartwood.use': 'Tiang | Balok',
-      'product.edge.use': 'Penutup Sudut',
+      'product.grove.use': 'Pelapis Dinding',   /* matches RIDGE's wording; review */
+      'product.ridge.use': 'Pelapis Dinding | Panel Dinding | Plafon',
+      'product.ledge.use': 'Tiang | Balok',
+      'product.sapling.use': 'Penutup Sudut',
       'product.measurements': 'Ukuran',
       'product.colors': 'Varian Warna',
+      'product.card.use': 'Kegunaan',
 
       'brand.intro.title': 'Komposit berkelanjutan untuk<br>lantai, dinding, dan struktur',
       'brand.craft.title': 'Lapisan<br>Keahlian',

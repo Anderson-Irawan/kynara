@@ -255,7 +255,7 @@ function kynara_search_index() {
  * ------------------------------------------------------------------------ */
 
 /**
- * Creates the four launch products if there are none yet, so the site is never
+ * Creates the seven launch products if there are none yet, so the site is never
  * empty on a fresh install. Never touches existing products.
  */
 function kynara_seed_products() {
@@ -263,11 +263,16 @@ function kynara_seed_products() {
 	if ( $existing ) {
 		return;
 	}
+	// Use lines: the first four carried over from the products they replaced
+	// (Bark, Heartwood, Edge) - to be confirmed. The last three have none yet.
 	$starters = array(
-		array( 'Grove',     'grove',     'Cladding' ),
-		array( 'Bark',      'bark',      'Cladding | Wall Panels | Ceiling' ),
-		array( 'Heartwood', 'heartwood', 'Posts | Beams' ),
-		array( 'Edge',      'edge',      'Close corners' ),
+		array( 'Grove',   'grove',   'Cladding' ),
+		array( 'Ridge',   'ridge',   'Cladding | Wall Panels | Ceiling' ),
+		array( 'Ledge',   'ledge',   'Posts | Beams' ),
+		array( 'Sapling', 'sapling', 'Close corners' ),
+		array( 'Cedar',   'cedar',   '' ),
+		array( 'Aspen',   'aspen',   '' ),
+		array( 'Lattice', 'lattice', '' ),
 	);
 	foreach ( $starters as $i => $s ) {
 		$id = wp_insert_post( array(
@@ -277,7 +282,7 @@ function kynara_seed_products() {
 			'post_name'   => $s[1],
 			'menu_order'  => $i + 1,
 		) );
-		if ( $id && ! is_wp_error( $id ) ) {
+		if ( $id && ! is_wp_error( $id ) && '' !== $s[2] ) {
 			// Value plus the field-key reference, which is what update_field() writes
 			// for a text field - so get_field() finds it with or without the plugin.
 			update_post_meta( $id, 'kynara_use', $s[2] );
