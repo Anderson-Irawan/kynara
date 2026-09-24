@@ -1,0 +1,13 @@
+/*
+Theme Name: KYNARA
+Theme URI: https://kynara.co.id/
+Author: Double Dash Creative
+Description: Custom theme for KYNARA - premium, sustainable WPC products. Products are managed in the admin under "Products"; they feed the Products page, the Home carousel, the footer and search.
+Version: 1.0.0
+Requires at least: 6.4
+Requires PHP: 7.4
+Text Domain: kynara
+*/
+
+/* The real stylesheet is assets/css/styles.css (enqueued in functions.php).
+   WordPress only reads the header comment above from this file. */

@@ -1,0 +1,784 @@
+/* ==========================================================================
+   KYNARA website styles
+   The style rules live in CLAUDE.md and have moved on from the drafts - read them
+   before editing. In short: flat surfaces, no shadows; motion only where CLAUDE.md
+   rule 1 lists it; every photo inside an .img-box; sizes only from the --t tiers;
+   full-bleed page with --page-pad either side.
+   ========================================================================== */
+
+/* ---------- Fonts (files live in /fonts) ---------- */
+@font-face { font-family: "Candara"; src: url("../fonts/Candara.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Candara"; src: url("../fonts/Candara_Italic.ttf") format("truetype"); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: "Candara"; src: url("../fonts/Candara_Bold.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Candara"; src: url("../fonts/Candara_Bold_Italic.ttf") format("truetype"); font-weight: 700; font-style: italic; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../fonts/DMSans-Regular.ttf") format("truetype"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../fonts/DMSans-Medium.ttf") format("truetype"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../fonts/DMSans-SemiBold.ttf") format("truetype"); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: "DM Sans"; src: url("../fonts/DMSans-Bold.ttf") format("truetype"); font-weight: 700; font-style: normal; font-display: swap; }
+
+/* ---------- Tokens ---------- */
+:root {
+  --cream: #f9f8f2;      /* page background, light text on dark */
+  --ink: #000000;        /* body text, rules, borders */
+  --green: #0b4f37;      /* KYNARA green (from logo files) */
+  --rust: #a04033;       /* accent circle, red card */
+  --brown: #8b5e3c;      /* brown card */
+  --swatch: #d9d9d9;     /* placeholder colour swatches / social squares */
+  --muted: #9a9a95;      /* input placeholder text */
+
+  --font-display: "Candara", "Segoe UI", "Trebuchet MS", sans-serif;
+  --font-body: "DM Sans", "Helvetica Neue", Arial, sans-serif;
+
+  /* ---- Type scale -------------------------------------------------------
+     Six tiers, shared by both faces, 12-based so the sizes sit on the same
+     grid as the spacing. The top four shrink by themselves on narrow
+     screens, which is why there are almost no font-size overrides in the
+     responsive blocks at the end of this file.
+     Change a tier here and it changes everywhere it is used.            */
+  --t1: clamp(36px, 5.6vw, 72px);  /* display - hero, contact title, product name */
+  --t2: clamp(30px, 3.8vw, 48px);  /* title   - feature headings */
+  --t3: clamp(26px, 2.8vw, 36px);  /* heading - section titles, story h2, subscribe, stat value */
+  --t4: clamp(20px, 1.9vw, 24px);  /* lead    - product use line */
+  --t5: 16px;                      /* body    - copy, footer links, form fields */
+  --t6: 14px;                      /* small   - labels, captions, the whole header bar */
+
+  /* The hero headline is a FITTED line, not a step on the scale: it is sized so the
+     longest entry in the word list spans 90% of the content box.
+     12.526em is the measured width of "Crafted for Harmonious Meetings" in Candara
+     at the -4% tracking, and 0.9 / 12.526 = 0.0718.
+     Remeasure if the wording, the word list or the display font changes. */
+  --t-hero: max(32px, calc((100vw - var(--page-pad) * 2) * 0.0718));
+
+  /* Candara is a wide face, so everything set in it is tracked in by 4% */
+  --tracking-display: -0.04em;
+
+  /* The search panel opens in two beats: the bar changes colour, then the field
+     slides down from behind it and fades in. Closing reverses that, and is quicker.
+     --ui-panel-delay is slightly less than --ui-color-ms so the beats hand over
+     smoothly instead of reading as two separate events.
+
+     Entering and leaving use DIFFERENT curves on purpose. --ui-enter is an
+     expo-out: it moves immediately and settles softly. --ui-exit accelerates away.
+     A symmetric ease-in-out is what made the close feel rough - it sat still for
+     the first third of the duration and then lurched. */
+  --ui-color-ms: 200ms;     /* bar background, text and logo */
+  --ui-panel-ms: 420ms;     /* the panel opening */
+  --ui-panel-delay: 150ms;  /* how long the panel waits for the colour */
+  --ui-fade-ms: 120ms;      /* leaving: the field fades out first... */
+  --ui-close-delay: 90ms;   /* ...and the panel waits this long before collapsing */
+  --ui-close-ms: 200ms;     /* leaving: the collapse itself */
+  --ui-enter: cubic-bezier(.16, 1, .3, 1);
+  --ui-exit: cubic-bezier(.4, 0, 1, 1);
+  --ui-ease: cubic-bezier(.7, 0, .2, 1);   /* the bar's colour crossfade */
+  --hover-ms: 280ms;        /* every hover on the site, on the --ui-enter curve */
+  --page-pad: 100px;     /* room left and right of the content; the page itself is full-bleed */
+  --header-h: 146px;
+  --header-h-small: 68px;  /* the bar once the page has scrolled */
+  --shrink-ms: 420ms;      /* the header shrinking / growing, on --ui-enter */
+  --bar-transition: height var(--shrink-ms) var(--ui-enter), min-height var(--shrink-ms) var(--ui-enter), padding var(--shrink-ms) var(--ui-enter);
+  --ui-close-wait: calc(var(--ui-close-delay) + var(--ui-close-ms));   /* when the search panel has fully gone */
+
+  /* The logomark's share of the logotype's width, measured from the artwork and cut
+     in the middle of the gap before the K. Remeasure if the logo artwork changes. */
+  --logo-mark: 0.3537;
+  /* The landscape logotype as a mask. GENERATED from logos/web/kynara-landscape-dark.svg
+     with the metadata stripped - regenerate it if the artwork changes, never hand-edit. */
+  --logo-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='76.82 76.81 1373.77 346.38' role='img' aria-label='KYNARA'%3E%3Cg fill='%23000000'%3E%3Cpath d='M725.66,346.37h-38.58c0-3.62-6.65-16.09-19.94-37.4-14.16-22.73-24.19-34.1-30.09-34.1h-3.54c0,17.93.43,41.77,1.3,71.5h-33.27c1.02-23.76,1.54-50.54,1.54-80.35s-.51-53.06-1.54-73.27h33.27c-.87,21.79-1.3,42.24-1.3,61.36h2.6c3.46,0,12.19-9.68,26.19-29.03,13.61-18.8,20.41-29.58,20.41-32.33h35.16c0,2.6-7.2,12.39-21.59,29.38-14.87,17.54-25.72,28.71-32.57,33.51v1.77c8.02,4.17,20.65,19.7,37.88,46.61,16.05,25.01,24.07,39.14,24.07,42.36Z'/%3E%3Cpath d='M858.99,192.74c0,3.23-4.48,11.92-13.45,26.08-13.77,21.63-22.14,35.09-25.13,40.35-8.97,15.97-13.45,27.81-13.45,35.52,0,17.31.47,34.53,1.42,51.68h-33.51c.86-17.23,1.3-34.57,1.3-52.03,0-8.02-4.13-20.18-12.39-36.46-3.86-7.55-11.56-21.04-23.13-40.47-8.26-13.92-12.39-22.14-12.39-24.66h37.05c0,2.83,4.94,14.77,14.81,35.81,9.87,21.04,14.81,34.63,14.81,40.76h1.89c0-5.66,4.82-18.56,14.46-38.7,9.64-20.14,14.45-32.76,14.45-37.88h33.27Z'/%3E%3Cpath d='M997.12,346.37h-29.14c0-3.22-10.82-20.25-32.45-51.09-22.65-32.49-35.56-54.71-38.7-66.67h-1.89c1.97,17.23,2.95,32.8,2.95,46.72,0,19.43.55,43.11,1.65,71.03h-29.03c1.18-24.38,1.77-51.17,1.77-80.35s-.59-53.14-1.77-73.27h35.04c0,4.17,9.71,20.81,29.15,49.91,20.69,30.92,32.57,51.88,35.63,62.89h1.77c-1.89-17.54-2.83-33.27-2.83-47.2,0-21.32-.55-43.19-1.65-65.61h29.5c-1.1,19.51-1.65,43.93-1.65,73.27s.55,56.36,1.65,80.35Z'/%3E%3Cpath d='M1162.37,346.37h-37.76c0-5.19-3.58-19.9-10.74-44.13h-54.51c-7.4,23.83-11.09,38.54-11.09,44.13h-35.52c0-3.07,9.18-28.24,27.55-75.52,18.37-47.28,27.55-73.31,27.55-78.11h44.6c0,4.48,8.32,30.15,24.96,76.99,16.64,46.84,24.96,72.39,24.96,76.64ZM1107.85,279.71c-13.45-40.59-20.18-62.54-20.18-65.84h-1.89c0,3.07-6.96,25.01-20.88,65.84h42.95Z'/%3E%3Cpath d='M1299.7,346.37h-34.92c-9.13-27.85-16.13-45.03-21-51.56-4.88-6.53-12.74-9.79-23.6-9.79-4.56,0-8.93.04-13.1.12,0,20.22.35,40.63,1.06,61.24h-32.8c1.02-23.76,1.54-50.54,1.54-80.35s-.51-53.06-1.54-73.27h20.41c2.36,0,7.3-.12,14.81-.35,7.51-.23,14.45-.35,20.82-.35,36.11,0,54.16,12.35,54.16,37.05,0,19.59-10.31,33.24-30.91,40.94v1.77c7.94,2.2,14.9,8.4,20.88,18.58,5.98,10.19,14.04,28.85,24.19,55.99ZM1255.46,237.82c0-15.65-10.07-23.48-30.21-23.48-7.4,0-13.92.55-19.59,1.65.86,12.2,1.3,28.08,1.3,47.67,4.33.16,7.99.23,10.97.23,25.02,0,37.52-8.69,37.52-26.07Z'/%3E%3Cpath d='M1424.07,348.89h0c0-5.19-6.63-22.42-13.79-46.65h-54.51c-7.4,23.83-11.09,38.54-11.09,44.13h-35.52c0-3.07,9.18-28.24,27.55-75.52,18.37-47.28,27.55-73.31,27.55-78.11h44.6c0,4.48,8.32,30.15,24.96,76.99,6.18,17.42,11.33,32.24,15.36,44.2,5.78,17.18-6.99,34.96-25.11,34.96ZM1404.26,279.71c-13.45-40.59-20.18-62.54-20.18-65.84h-1.89c0,3.07-6.96,25.01-20.88,65.84h42.95Z'/%3E%3Cpath d='M258.39,409.77c-.32.35-.65.69-.98,1.04-3.62,3.8-1.81,12.38,2.6,12.38h80.27c4.41,0,6.22-8.58,2.6-12.38-.33-.34-.65-.69-.98-1.04-24.98-26.77-58.53-26.77-83.52,0Z'/%3E%3Cpath d='M187.15,256.76c19.15-3.29,44.16-11.71,64-23.08,22.71-13.01,33.55,14.87,9.49,34.04-28.83,23-58.73,32.18-78.93,51.29-1.58,1.49-2.79,3.19-3.64,4.98-.01.02-.03.04-.03.07-1.74,3.68-1.98,7.79-.92,11.54h0c3.07,7.13,12.66,12.67,24.72,14.23,2.22.22,4.57.37,7.08.43h.1c.59,0,1.2.01,1.8.01,11.82,0,25.28-5.59,37.49-13.08,33.34-20.43,38.8,3.49,33.89,16.48-14.92,39.45-52.84,68.35-97.36,69.15-21.28.38-41.16-5.51-57.92-15.95-30.08-18.71-50.1-52.07-50.1-90.11,0-89.33,64.93-139.99,103.62-167.5,47.11-33.49,60.79-46.58,81.05-64.91,16.32-14.77,31.71-7.09,22.84,16.55-13.97,37.2-57.27,67.51-87,86.34-2.8,1.77-.63,6.06,2.45,4.87,24.06-9.3,44.39-20.68,67.74-34.82,15.42-9.34,26.78,10.38,12.4,28.88-25.77,33.15-79.24,57.94-94.39,65.6-2.72,1.38-1.35,5.5,1.63,4.98Z'/%3E%3Cpath d='M413.14,256.76c-19.15-3.29-44.16-11.71-64-23.08-22.71-13.01-33.55,14.87-9.49,34.04,28.83,23,58.73,32.18,78.93,51.29,1.58,1.49,2.79,3.19,3.64,4.98.01.02.03.04.03.07,1.74,3.68,1.98,7.79.92,11.54h0c-3.07,7.13-12.66,12.67-24.72,14.23-2.22.22-4.57.37-7.08.43h-.1c-.59,0-1.2.01-1.8.01-11.82,0-25.28-5.59-37.49-13.08-33.34-20.43-38.8,3.49-33.89,16.48,14.92,39.45,52.84,68.35,97.36,69.15,21.28.38,41.16-5.51,57.92-15.95,30.08-18.71,50.1-52.07,50.1-90.11,0-89.33-64.93-139.99-103.62-167.5-47.11-33.49-60.79-46.58-81.05-64.91-16.32-14.77-31.71-7.09-22.84,16.55,13.97,37.2,57.27,67.51,87,86.34,2.8,1.77.63,6.06-2.45,4.87-24.06-9.3-44.39-20.68-67.74-34.82-15.42-9.34-26.78,10.38-12.4,28.88,25.77,33.15,79.24,57.94,94.39,65.6,2.72,1.38,1.35,5.5-1.63,4.98Z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+/* Anchor targets land below the fixed (shrunk) header rather than under it */
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: calc(var(--header-h-small) + 24px); }
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--t5);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+h1, h2, h3, h4, p { margin: 0; }
+ul { margin: 0; padding: 0; list-style: none; }
+:focus-visible { outline: 1px solid currentColor; outline-offset: 4px; }
+
+/* Lenis smooth scrolling (js/vendor/lenis.min.js). These are the library's own
+   required rules, copied from lenis/dist/lenis.css 1.3.26 - keep them in step with
+   the vendored version. Don't add `scroll-behavior: smooth` anywhere: it fights Lenis. */
+html.lenis, html.lenis body { height: auto; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.lenis [data-lenis-prevent],
+.lenis [data-lenis-prevent-wheel],
+.lenis [data-lenis-prevent-touch],
+.lenis [data-lenis-prevent-vertical],
+.lenis [data-lenis-prevent-horizontal] { overscroll-behavior: contain; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+
+/* Full-bleed page: no max-width, just fixed room left and right (--page-pad) */
+.wrap { margin: 0 auto; padding-left: var(--page-pad); padding-right: var(--page-pad); }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Every place Candara is used, tracked in by 4% ---------- */
+.hero__title, .section-title, .story h2, .product-card__name, .product-card__use,
+.feature__title, .stat__value, .contact__title, .subscribe h2 {
+  letter-spacing: var(--tracking-display);
+}
+
+/* ---------- Image box: every image lives in one ---------- */
+.img-box { position: relative; overflow: hidden; background: #cfcfc8; }
+.img-box > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+/* The header is FIXED on every page and shrinks once the page has scrolled
+   (.is-scrolled, set by main.js). Fixed rather than sticky, on purpose: a sticky
+   header that shrinks changes its own height in the flow, which moves the page
+   under it and shifts the scroll position - enough to flip the threshold back and
+   forth. Here the light-header pages reserve the full height with a margin on
+   <main>, so the bar can get shorter without anything else moving. */
+.site-header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+  /* coming back: settles in on the entrance curve */
+  transition: transform var(--shrink-ms) var(--ui-enter), opacity var(--shrink-ms) var(--ui-enter);
+}
+/* At the footer the header slides up out of the way (main.js sets .is-hidden).
+   Leaving uses the exit curve and is quicker. :focus-within brings it straight back
+   if someone tabs into the nav, so keyboard users can never lose it. */
+.site-header.is-hidden:not(:focus-within) {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform var(--ui-panel-ms) var(--ui-exit), opacity var(--ui-panel-ms) var(--ui-exit);
+}
+.site-header--light + main { margin-top: var(--header-h); }
+.site-header.is-scrolled { --bar-h: var(--header-h-small); }
+
+.site-header__bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: var(--bar-h, var(--header-h));
+  position: relative; z-index: 2;      /* above the search panel, which hides behind it */
+  transition: var(--bar-transition);
+}
+.site-header--light .site-header__bar { background: var(--cream); }
+
+/* The header rule stops at the page margins rather than running edge to edge. It is
+   a pseudo-element because the bar itself carries the --page-pad padding, so a
+   border on it would span the full width. Only the bar has one: the search panel
+   overlays the page, and a hard line at its bottom edge read as a stray border. */
+.site-header--light .site-header__bar::after,
+.site-header--overlay .site-header__bar::after {
+  content: "";
+  position: absolute; left: var(--page-pad); right: var(--page-pad); bottom: 0;
+  border-bottom: 1px solid var(--ink);
+}
+.site-header--overlay { color: var(--cream); }
+
+/* Over the hero the bar is transparent. It takes the same cream treatment as the
+   Products/Contact header whenever it needs a surface of its own: while the search
+   panel is open, and once the page has scrolled. */
+.site-header--overlay .site-header__bar {
+  transition:
+    var(--bar-transition),
+    background-color var(--ui-color-ms) var(--ui-ease),
+    color var(--ui-color-ms) var(--ui-ease);
+}
+.site-header--overlay.is-search-open .site-header__bar,
+.site-header--overlay.is-scrolled .site-header__bar { background-color: var(--cream); color: var(--ink); }
+
+/* The rule under the bar. Products/Contact show it at the top of the page; the hero
+   pages never do. Once the bar shrinks it goes on every page, so the small bar floats
+   clean over the content - and it only comes back while the search panel is open,
+   where it separates the bar from the panel. (Order matters: search-open must come
+   after is-scrolled, since they have equal specificity.) */
+.site-header__bar::after { transition: opacity var(--ui-color-ms) var(--ui-ease); }
+.site-header--overlay .site-header__bar::after,
+.site-header.is-scrolled .site-header__bar::after { opacity: 0; }
+.site-header.is-search-open .site-header__bar::after { opacity: 1; }
+
+/* Closing the search panel: the colour has to wait until the panel has gone, or the
+   bar turns transparent above a still-visible cream panel. main.js sets
+   .is-search-closing for exactly that window, so the delay applies only then -
+   scrolling back to the top returns the bar to transparent straight away. */
+.site-header--overlay.is-search-closing .site-header__bar {
+  transition:
+    var(--bar-transition),
+    background-color var(--ui-color-ms) var(--ui-ease) var(--ui-close-wait),
+    color var(--ui-color-ms) var(--ui-ease) var(--ui-close-wait);
+}
+/* On every page, the rule also waits for the panel to leave before it disappears */
+.site-header.is-search-closing .site-header__bar::after {
+  transition: opacity var(--ui-color-ms) var(--ui-ease) var(--ui-close-wait);
+}
+
+/* The logo is the landscape logotype drawn as a MASK (--logo-mask, in :root) filled
+   with the text colour. That lets it change colour on hover, and it simply follows
+   the text colour everywhere - cream over the hero, black on cream, darkening with
+   the bar - with no second image. The mask is an embedded data URI rather than
+   url("../logos/..."): browsers fetch mask images with CORS, and a page opened
+   straight from disk (file://) is refused, drawing the logo as a solid rectangle.
+
+   Two layers of the SAME mask:
+   - ::before is the whole logotype;
+   - ::after (header only) is cropped to the logomark - the left --logo-mark of the
+     width, cut in the gap before the K - and is always shown.
+   When the header shrinks, ::before fades out, the link narrows to the mark and the
+   whole logo scales down. Both layers draw the mark in exactly the same place, so it
+   stays solid while "KYNARA" fades and retracts behind it.
+
+   They are pseudo-elements rather than the <a> itself because a mask clips
+   everything on its element, including the keyboard focus outline. */
+.brand-logo {
+  --logo-w: 195px;
+  position: relative; display: inline-block; vertical-align: middle;
+  width: var(--logo-w);
+  overflow: hidden;                    /* clips the fading wordmark as the link narrows */
+  transform-origin: left center;
+  transition: width var(--shrink-ms) var(--ui-enter), transform var(--shrink-ms) var(--ui-enter);
+}
+.brand-logo::before,
+.site-header .brand-logo::after {
+  background-color: currentColor;
+  -webkit-mask-image: var(--logo-mask); mask-image: var(--logo-mask);
+  -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+  transition: background-color var(--hover-ms) var(--ui-enter), opacity var(--shrink-ms) var(--ui-enter);
+}
+.brand-logo::before {
+  content: ""; display: block;
+  width: var(--logo-w);
+  aspect-ratio: 1373.77 / 346.38;      /* the logotype's viewBox */
+  -webkit-mask-size: 100% 100%; mask-size: 100% 100%;
+}
+.site-header .brand-logo::after {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0;
+  width: calc(var(--logo-w) * var(--logo-mark));
+  -webkit-mask-size: var(--logo-w) 100%; mask-size: var(--logo-w) 100%;
+  -webkit-mask-position: 0 0; mask-position: 0 0;
+}
+.site-header.is-scrolled .brand-logo {
+  width: calc(var(--logo-w) * var(--logo-mark));
+  transform: scale(.78);
+}
+.site-header.is-scrolled .brand-logo::before { opacity: 0; }
+
+/* Windows high-contrast mode replaces backgrounds, which would erase a masked logo */
+@media (forced-colors: active) {
+  .brand-logo::before, .site-header .brand-logo::after { background-color: CanvasText; forced-color-adjust: none; }
+}
+
+/* Set by main.js for the first two frames only, so a page that opens already
+   scrolled starts with the small header instead of animating into it. */
+.site-header.is-instant,
+.site-header.is-instant *,
+.site-header.is-instant *::before,
+.site-header.is-instant *::after { transition: none !important; }
+
+.main-nav ul { display: flex; gap: 0; }
+/* Fixed width, not min-width: the nav must not reflow when the language changes.
+   170px holds the widest label in either language - "[ Tentang Merek ]" at 112.7px
+   measured in DM Sans at --t6 - plus the 24px padding either side. */
+.main-nav a {
+  display: inline-block;
+  font-size: var(--t6);
+  line-height: 1;
+  padding: 0 24px;
+  width: 170px;
+  text-align: center;
+}
+.main-nav a[aria-current="page"]::before { content: "[ "; }
+.main-nav a[aria-current="page"]::after { content: " ]"; }
+
+.header-tools { display: flex; justify-content: flex-end; align-items: center; gap: 26px; font-size: var(--t6); line-height: 1; }
+/* Language: a globe that opens a list, so switching is an explicit choice */
+.lang-switch { position: relative; white-space: nowrap; }
+.lang-switch__toggle { display: inline-flex; align-items: center; gap: 6px; line-height: 1; }
+.lang-switch__toggle svg { width: 15px; height: 15px; display: block; }
+.lang-switch__menu {
+  display: none;
+  position: absolute; right: 0; top: calc(100% + 10px); z-index: 30;
+  min-width: 170px;
+  background: var(--cream); color: var(--ink);
+  border: 1px solid var(--ink);
+}
+.lang-switch__menu.is-open { display: block; }
+.lang-switch__menu button {
+  display: block; width: 100%; text-align: left;
+  padding: 11px 14px; font-size: var(--t6); line-height: 1;
+}
+.lang-switch__menu button + button { border-top: 1px solid var(--ink); }
+.lang-switch__menu button[aria-pressed="true"] { font-weight: 700; }
+/* Magnifier + label, laid out like the globe toggle. SEARCH becomes the shorter
+   "CARI" in Indonesian; the fixed min-width (55px widest label + 15px icon + 6px gap)
+   stops the globe to its left from sliding when the language changes, and
+   flex-start keeps the icon itself in place too. The label is its own <span>
+   because applyLang() sets textContent, which would wipe an icon on the button. */
+.search-toggle {
+  display: inline-flex; align-items: center; justify-content: flex-start; gap: 6px;
+  min-width: 76px; line-height: 1;
+}
+.search-toggle svg { width: 15px; height: 15px; display: block; flex: none; }
+.menu-toggle { display: none; }
+
+/* Hover (style rule 1). Every interactive thing answers the pointer with the same
+   unhurried, eased change - --hover-ms on the --ui-enter curve - so the page moves
+   with one rhythm. Colour and underline only: never a lift, a scale or a shadow.
+
+   Underlines fade in and rise into place. They are always present but transparent
+   and sitting low; hover brings the colour up and draws the line in to 3px.
+   (A drawn-on background-image underline was avoided: it measures the box, not the
+   text, and the nav links are fixed-width 170px boxes.) The decoration propagates
+   through the icon buttons to their text only, so icons are never underlined. */
+.main-nav a,
+.search-toggle,
+.menu-toggle,
+.lang-switch__toggle,
+.lang-switch__menu button,
+.btn-bracket,
+.subscribe__field button,
+.footer-cols a,
+.footer-bottom a,
+.collection__item h3 {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-decoration-color: transparent;
+  text-underline-offset: 7px;
+  transition:
+    text-decoration-color var(--hover-ms) var(--ui-enter),
+    text-underline-offset var(--hover-ms) var(--ui-enter);
+}
+.main-nav a:hover,
+.search-toggle:hover,
+.menu-toggle:hover,
+.lang-switch__toggle:hover,
+.lang-switch__menu button:hover,
+.btn-bracket:hover,
+.subscribe__field button:hover,
+.footer-cols a:hover,
+.footer-bottom a:hover,
+.collection__item a:hover h3 {        /* the whole product card is the link; its name answers */
+  text-decoration-color: currentColor;
+  text-underline-offset: 3px;
+}
+
+/* The logo changes colour: brand green wherever it sits dark on cream/white, rust over
+   the hero photo, where green would disappear into the dark-green gradient. (Rust there
+   is still quite low-contrast, so that change is deliberately subtle.) The same
+   transition also smooths the logo as it follows the bar when search opens. */
+.brand-logo:hover::before,
+.brand-logo:hover::after { background-color: var(--green); }
+.site-header--overlay:not(.is-search-open):not(.is-scrolled) .brand-logo:hover::before,
+.site-header--overlay:not(.is-search-open):not(.is-scrolled) .brand-logo:hover::after { background-color: var(--rust); }
+
+/* Circle buttons invert: cream fill, green text/icon. Both live in the green Home
+   section, so this is a straight swap of their cream-on-green. The border goes cream
+   too so the disc keeps a clean edge against the green behind it. */
+.circle-btn {
+  transition:
+    background-color var(--hover-ms) var(--ui-enter),
+    color var(--hover-ms) var(--ui-enter),
+    border-color var(--hover-ms) var(--ui-enter);
+}
+.circle-btn:hover { background-color: var(--cream); color: var(--green); border-color: var(--cream); }
+
+/* Search panel (see style rule 1). Two beats: the bar changes colour, then the panel
+   slides down from behind it and fades in. Closing reverses that, and is quicker.
+   Each state carries its own transition, with the delay on whichever beat waits.
+
+   It is absolutely positioned and animates ONLY transform and opacity, which the
+   compositor can handle without touching layout. An earlier version animated
+   grid-template-rows so the page below was pushed down instead of overlapped, but
+   track sizing is a layout property: every frame reflowed the panel and, on the
+   light-header pages, the whole document under it. That is what stuttered.
+   **Don't reintroduce a height/grid/max-height animation here.**
+
+   The trade-off is that the open panel now overlays the top of the page instead of
+   pushing it down. That is the usual behaviour for a search drawer and it removes
+   the layout shift entirely. The bar above it is opaque and has a higher z-index,
+   so the panel stays hidden while it is tucked up behind it. */
+.search-panel {
+  position: absolute;
+  top: 100%; left: 0; right: 0;
+  z-index: 1;                      /* under the bar, so it is hidden while tucked up behind it */
+  background: var(--cream); color: var(--ink);
+  transform: translateY(-18px);
+  opacity: 0;
+  visibility: hidden;
+  /* leaving: fade out quickly, lift away, then drop out of the tab order */
+  transition:
+    transform var(--ui-close-ms) var(--ui-exit),
+    opacity var(--ui-fade-ms) var(--ui-exit),
+    visibility 0s linear var(--ui-close-ms);
+}
+.search-panel.is-open {
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+  /* entering: wait for the bar colour, then settle down into place */
+  transition:
+    transform var(--ui-panel-ms) var(--ui-enter) var(--ui-panel-delay),
+    opacity var(--ui-panel-ms) var(--ui-enter) var(--ui-panel-delay),
+    visibility 0s;
+}
+.site-header--overlay .search-panel { border-top: 0; }
+.search-panel__inner { padding-top: 24px; padding-bottom: 24px; }
+/* The magnifier sits inside the field, so the input is padded to clear it */
+.search-field { position: relative; }
+.search-field__icon {
+  position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
+  width: 18px; height: 18px; pointer-events: none;
+}
+.search-panel input {
+  width: 100%; height: 52px; padding: 0 16px 0 48px;
+  border: 1px solid var(--ink); border-radius: 0; background: transparent;
+  font: 400 var(--t5)/1 var(--font-body); color: var(--ink);
+}
+.search-results { margin-top: 12px; }
+.search-results a { display: block; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,.15); }
+.search-results a span { opacity: .55; font-size: var(--t6); margin-left: 10px; }
+.search-results p { padding: 8px 0; opacity: .6; }
+
+/* ==========================================================================
+   Hero (Home + The Brand)
+   ========================================================================== */
+/* Full-height hero. svh is the small viewport height, so the hero does not jump
+   when mobile browser chrome hides; the vh line is the fallback for older browsers. */
+.hero { position: relative; height: 100vh; height: 100svh; color: var(--cream); overflow: hidden; }
+.hero__media { position: absolute; inset: 0; }
+.hero__media > img { object-position: center 40%; }
+.hero__media::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(90deg, rgba(11,79,55,.82) 0%, rgba(24,66,45,.62) 42%, rgba(160,82,56,.62) 78%, rgba(160,72,50,.72) 100%);
+}
+
+/* Parallax on the Home hero (style rule 1). The photo is 130% of the hero height and
+   starts shifted up by the overflow, so it has room to drift down as the page scrolls
+   without ever exposing an edge. main.js drives the transform; with JS off, or under
+   reduced motion, the photo simply sits still and nothing looks broken.
+   The gradient rides along because it is a child of the same box. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero--parallax .hero__media { height: 130%; top: -30%; will-change: transform; }
+}
+
+/* Home hero -> green section. Two layers above the photo and glow, under the headline:
+   - .hero__fade is static: the bottom of the hero eases into exactly --green, so
+     there is no seam against .home-green. The stops are spaced as an ease rather
+     than a straight ramp, which would show a visible line where the fade begins.
+     (Interpolating from `transparent` is premultiplied in current browsers, so there
+     is no grey band mid-fade.)
+   - .hero__wash is solid --green; main.js raises its opacity with scroll progress,
+     so the photo dissolves into the green as the hero leaves. Opacity only, so it is
+     composited. Under reduced motion it stays at 0 and only the static fade shows. */
+.hero__fade,
+.hero__wash { position: absolute; inset: 0; pointer-events: none; }
+.hero__fade {
+  background: linear-gradient(to bottom,
+    transparent 38%,
+    color-mix(in srgb, var(--green) 14%, transparent) 55%,
+    color-mix(in srgb, var(--green) 42%, transparent) 70%,
+    color-mix(in srgb, var(--green) 76%, transparent) 85%,
+    var(--green) 100%);
+}
+.hero__wash { background: var(--green); opacity: 0; will-change: opacity; }
+
+/* Home hero photo is a crop of cosmos_1160439100.jpeg (canopy to path, dead grass
+   trimmed). 70% keeps the dancing couple and the bike above the headline. */
+.hero__media--home > img { object-position: center 70%; }
+
+/* Interactive glow (Home, style rule 1): a soft rust light that trails the pointer
+   over the green-to-rust gradient. It is its own element moved with transform, not
+   a gradient whose stops change, so following the mouse costs no repaint.
+   It starts off-centre right, where the static gradient is already warm, so with no
+   pointer (touch, reduced motion, JS off) it simply reads as part of the gradient. */
+.hero__glow {
+  position: absolute; left: 0; top: 0;
+  width: 70vmax; height: 70vmax;
+  margin: -35vmax 0 0 -35vmax;          /* centre the circle on its translate point */
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(160, 64, 51, .5) 0%, rgba(160, 64, 51, .18) 40%, rgba(160, 64, 51, 0) 70%);
+  pointer-events: none;
+  transform: translate3d(70vw, 45vh, 0);
+  will-change: transform;
+}
+/* The headline is anchored to the bottom of the hero rather than a fixed offset
+   from the top: the hero is now viewport-height, so the old 468px padding no
+   longer lands in the right place. */
+.hero__content { position: relative; height: 100%; display: flex; align-items: flex-end; padding-bottom: clamp(72px, 20vh, 220px); }
+.hero__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t-hero);
+  line-height: 1.1;
+  white-space: nowrap;
+}
+.hero__title em { font-style: italic; }
+/* No ID size override here on purpose: the hero is a fixed English brand line,
+   so it is the same width in both languages and cannot overflow the nowrap. */
+
+/* ---------- Rolling word ---------- */
+.roller {
+  position: relative;
+  display: inline-block;
+  vertical-align: bottom;
+  height: 1.1em;
+  font-style: italic;
+  transition: width var(--roll-ms, 490ms) cubic-bezier(.7, 0, .2, 1);
+}
+.roller__word {
+  position: absolute; left: 0; top: 0;
+  white-space: nowrap;
+  transform: translateY(calc(var(--o, 0) * 0.82em));
+  opacity: 0;
+  transition:
+    transform var(--roll-ms, 490ms) cubic-bezier(.7, 0, .2, 1),
+    opacity var(--roll-ms, 490ms) linear;
+}
+/* Only the word taking centre is visible. The others still move through the
+   stack, they are just transparent while they do it. */
+.roller__word[data-pos="0"] { opacity: 1; }
+.roller.no-transition, .roller__word.no-transition { transition: none; }
+@media (prefers-reduced-motion: reduce) {
+  .roller, .roller__word,
+  .search-panel, .search-panel.is-open,
+  .site-header--overlay .site-header__bar,
+  .site-header__bar::after,
+  .main-nav a, .search-toggle, .menu-toggle, .lang-switch__toggle, .lang-switch__menu button,
+  .btn-bracket, .subscribe__field button, .footer-cols a, .footer-bottom a,
+  .collection__item h3, .brand-logo::before, .circle-btn,
+  .site-header, .site-header.is-hidden:not(:focus-within),
+  .site-header__bar, .brand-logo, .site-header .brand-logo::after,
+  .site-header--overlay.is-search-closing .site-header__bar,
+  .site-header.is-search-closing .site-header__bar::after { transition: none; }
+}
+
+/* ==========================================================================
+   Home: collection carousel + story cards (green section)
+   ========================================================================== */
+.home-green { background: var(--green); color: var(--cream); padding: 146px 0 68px; overflow: hidden; }
+.section-title { font-family: var(--font-display); font-weight: 400; font-size: var(--t3); line-height: 1.15; }
+
+.collection__track {
+  display: flex; gap: 34px;
+  margin-top: 22px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  margin-right: calc(var(--page-pad) * -1 - 200px); /* lets the third card bleed off the edge, as drawn */
+  padding-right: 200px;
+}
+.collection__track::-webkit-scrollbar { display: none; }
+.collection__item { flex: 0 0 422px; scroll-snap-align: start; }
+.collection__item .img-box { aspect-ratio: 422 / 402; }
+.collection__item h3 { font-family: var(--font-body); font-weight: 700; font-size: var(--t5); margin-top: 42px; }
+.collection__controls { display: flex; justify-content: flex-end; margin-top: 18px; }
+
+.circle-btn {
+  display: inline-flex; align-items: center; justify-content: center; text-align: center;
+  width: 140px; height: 140px; border-radius: 50%;
+  border: 1px solid currentColor;
+  font-size: var(--t6); line-height: 1.45;
+}
+.circle-btn svg { width: 22px; height: 22px; }
+
+.story { position: relative; display: grid; grid-template-columns: 42.5% 15% 42.5%; grid-template-rows: auto auto 1fr; }
+.story__brown-bg { grid-column: 1 / 3; grid-row: 1 / 3; background: var(--brown); }
+.story__brown-head { grid-column: 1 / 3; grid-row: 1; padding: 55px 55px 30px; }
+.story__brown-media { grid-column: 1 / 3; grid-row: 2; padding: 14px 55px 55px; }
+.story__brown-media .img-box { aspect-ratio: 557 / 562; }
+.story__card--red { grid-column: 2 / 4; grid-row: 2 / 4; background: var(--rust); position: relative; z-index: 1; padding: 55px; }
+.story h2 { font-family: var(--font-display); font-weight: 400; font-size: var(--t3); line-height: 1.12; }
+.story p { font-size: var(--t6); line-height: 1.3; margin-top: 28px; max-width: 560px; }
+.story__card--red .img-box { aspect-ratio: 556 / 670; margin-top: 44px; }
+.story__link { grid-column: 1; grid-row: 3; align-self: start; margin-top: 42px; }
+
+/* ==========================================================================
+   Products page
+   ========================================================================== */
+.products { padding: 104px 0 146px; }
+.product-list { display: grid; gap: 42px; }
+.product-card {
+  display: grid;
+  grid-template-columns: 292px 1fr;
+  gap: 60px;
+  padding: 37px 40px;
+  border: 1px solid var(--ink);
+  border-radius: 46px;
+}
+.product-card .img-box { aspect-ratio: 292 / 374; }
+.product-card__name { font-family: var(--font-display); font-weight: 700; font-size: var(--t1); line-height: .9; margin-top: 18px; }
+/* Names are stored in title case in the admin ("Grove"); the Products page shows
+   them in capitals, while the Home carousel and footer keep title case, as drawn. */
+.product-card__name { text-transform: uppercase; }
+/* Measurements from the admin: label / value rows */
+.product-card__measurements { margin: 28px 0 0; font-size: var(--t5); line-height: 1.4; }
+.product-card__measurements div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; padding: 6px 0; border-bottom: 1px solid var(--ink); }
+.product-card__measurements dt { margin: 0; }
+.product-card__measurements dd { margin: 0; text-align: right; }
+.product-card__use { font-family: var(--font-display); font-size: var(--t4); line-height: 1.2; margin-top: 12px; }
+.product-card__specs { display: grid; grid-template-columns: 294px 1fr; margin-top: 48px; }
+.product-card__specs h3 { font-family: var(--font-body); font-weight: 500; font-size: var(--t5); }
+.swatches { display: grid; grid-template-columns: repeat(6, 42px); gap: 16px 16px; margin-top: 28px; }
+.swatch { width: 42px; height: 42px; border-radius: 50%; background: var(--swatch); }
+
+/* ==========================================================================
+   The Brand page
+   ========================================================================== */
+.brand-body { padding: 44px 0 0; }
+.feature { display: grid; grid-template-columns: 1fr 1.55fr; gap: 60px; margin-bottom: 55px; }
+.feature--reverse { grid-template-columns: 1.07fr 1fr; }
+.feature__text { display: flex; flex-direction: column; justify-content: space-between; padding-top: 0; }
+.feature__title { font-family: var(--font-display); font-weight: 400; font-size: var(--t2); line-height: 1.1; padding-top: 0; }
+.feature .img-box { aspect-ratio: 669 / 854; }
+.feature--reverse .img-box { aspect-ratio: 569 / 851; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; max-width: 430px; font-size: var(--t6); line-height: 1.3; }
+.feature__text .two-col { margin-bottom: 270px; }
+.feature--reverse .feature__text { padding-left: 55px; }
+.feature--reverse .feature__text .two-col { margin-bottom: 55px; }
+
+.stats { display: grid; grid-template-columns: repeat(2, 176px); gap: 30px 20px; margin-top: 90px; }
+.stat {
+  width: 176px; height: 176px; border-radius: 50%; border: 1px solid var(--ink);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  padding: 0 22px;
+}
+.stat__value { font-family: var(--font-display); font-size: var(--t3); line-height: 1; }
+.stat__label { font-size: var(--t6); line-height: 1.2; margin-top: 12px; }
+.feature--last { margin-bottom: 0; padding-bottom: 60px; }
+
+/* ==========================================================================
+   Contact page
+   ========================================================================== */
+.contact { padding: 100px 0 64px; }
+/* The page is centred: title, form column and button row share one centre line.
+   Field labels stay left-aligned inside the form, over their left-aligned inputs. */
+.contact__title { font-family: var(--font-display); font-weight: 400; font-size: var(--t1); line-height: 1.1; text-align: center; }
+.enquiry-form { margin: 26px auto 0; max-width: 767px; }
+.field { display: block; margin-bottom: 14px; }
+.field__label { display: block; font-size: var(--t6); line-height: 1; margin-bottom: 9px; }
+.field input, .field textarea {
+  display: block; width: 100%; height: 52px; padding: 0 14px;
+  border: 1px solid var(--ink); border-radius: 0; background: transparent;
+  font: 400 var(--t5)/1.4 var(--font-body); color: var(--ink);
+  -webkit-appearance: none; appearance: none;
+}
+.field textarea { height: 122px; padding: 12px 14px; resize: vertical; }
+.field input[type="file"] { padding: 0 14px; line-height: 50px; font-size: var(--t6); }
+.field input[type="file"]::file-selector-button {
+  margin-right: 14px; padding: 6px 14px;
+  border: 1px solid var(--ink); border-radius: 0; background: transparent;
+  font: 400 var(--t6)/1 var(--font-body); color: var(--ink); cursor: pointer;
+}
+.field input:invalid:not(:placeholder-shown), .field textarea:invalid:not(:placeholder-shown) { border-color: var(--rust); }
+/* Stacked, not side by side: a status message appearing beside the button would push
+   it off the centre line. */
+.form-actions { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 28px; text-align: center; }
+.btn-bracket { font-size: var(--t5); line-height: 1; padding: 14px 0; }
+.btn-bracket::before { content: "[ "; }
+.btn-bracket::after { content: " ]"; }
+.form-status { font-size: var(--t6); }
+.form-status.is-error { color: var(--rust); }
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+/* Cream, the same surface as the nav, rather than the white the drafts used */
+.site-footer { background: var(--cream); padding: 200px 0 64px; }
+.subscribe { display: grid; grid-template-columns: 1fr 472px 98px; align-items: center; padding-bottom: 54px; border-bottom: 1px solid var(--ink); }
+.subscribe h2 { font-family: var(--font-display); font-weight: 700; font-size: var(--t3); line-height: 1; max-width: 450px; }
+.subscribe__field {
+  position: relative; display: block; height: 52px;
+  border: 1px solid var(--ink);
+}
+.subscribe__field span { position: absolute; left: 14px; top: 9px; font-size: var(--t6); line-height: 1; color: var(--muted); text-transform: uppercase; }
+.subscribe__field input {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  padding: 22px 110px 6px 14px; border: 0; border-radius: 0; background: transparent;
+  font: 400 var(--t5)/1 var(--font-body); color: var(--ink);
+}
+.subscribe__field input::placeholder { color: var(--muted); }
+.subscribe__field button { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: var(--t6); letter-spacing: .04em; text-transform: uppercase; }
+.subscribe__status { grid-column: 2; font-size: var(--t6); margin-top: 8px; min-height: 1em; }
+
+.footer-cols { display: grid; grid-template-columns: 1fr 1fr 1fr 2.9fr; padding-top: 48px; }
+.footer-cols h3 { font-family: var(--font-body); font-weight: 700; font-size: var(--t5); line-height: 1.2; margin-bottom: 36px; }
+.footer-cols li { font-size: var(--t5); line-height: 26px; }
+.socials { display: flex; gap: 23px; margin-top: 16px; }
+.socials a { display: block; width: 24px; height: 24px; background: var(--swatch); }
+
+.footer-bottom { display: flex; align-items: center; gap: 58px; margin-top: 136px; }
+.footer-bottom .brand-logo { --logo-w: 200px; }
+.footer-bottom nav { display: flex; gap: 58px; font-weight: 700; font-size: var(--t5); }
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 1180px) {
+  :root { --page-pad: 60px; }
+  .main-nav a { width: 150px; padding: 0 14px; }   /* still clears the widest ID label */
+  .feature { grid-template-columns: 1fr 1.3fr; }
+  .feature--reverse { grid-template-columns: 1.1fr 1fr; }
+  .product-card__specs { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 900px) {
+  :root { --header-h: 88px; --header-h-small: 60px; --page-pad: 32px; }
+  .site-header__bar { grid-template-columns: auto 1fr auto; gap: 16px; }
+    .brand-logo { --logo-w: 130px; }
+  .menu-toggle { display: inline-block; font-size: var(--t6); }
+  .main-nav { display: none; grid-column: 1 / -1; order: 3; }
+  .main-nav.is-open { display: block; padding-bottom: 20px; }
+  .site-header--overlay .main-nav.is-open { background: transparent; }
+  .main-nav ul { flex-direction: column; }
+  .main-nav a { text-align: left; padding: 10px 0; font-size: var(--t5); min-width: 0; }
+  /* Keep the side padding from .wrap here: the shorthand used to zero it, which
+     pushed the logo and MENU hard against the screen edges on phones. */
+  .site-header__bar { height: auto !important; min-height: var(--bar-h, var(--header-h)); padding: 20px var(--page-pad); }
+  .site-header.is-scrolled .site-header__bar { padding-top: 10px; padding-bottom: 10px; }
+  .header-tools { gap: 14px; }
+
+  /* height and headline position are viewport-relative now, so no mobile override */
+  .hero__title { white-space: normal; }
+  .hero .roller { display: block; margin: .15em 0; } /* own line on phones; the neighbours are hidden now, so it needs no room for them */
+
+  .home-green { padding-top: 80px; }
+  .collection__item { flex-basis: 78%; }
+  .story { grid-template-columns: 1fr; }
+  .story { grid-template-rows: none; }
+  .story__brown-bg { display: none; }
+  .story__brown-head, .story__brown-media, .story__card--red, .story__link { grid-column: 1; grid-row: auto; }
+  .story__brown-head, .story__brown-media { background: var(--brown); }
+  .story__brown-head { padding: 32px 24px 24px; }
+  .story__brown-media { padding: 0 24px 32px; }
+  .story__card--red { padding: 32px 24px; }
+
+  .product-card { grid-template-columns: 1fr; gap: 24px; padding: 24px; border-radius: 32px; }
+  .product-card .img-box { aspect-ratio: 4 / 3; }
+  .product-card__name { margin-top: 0; overflow-wrap: anywhere; }
+  .product-card__specs { grid-template-columns: 1fr; gap: 24px; margin-top: 28px; }
+  .swatches { grid-template-columns: repeat(6, 36px); gap: 12px; }
+  .swatch { width: 36px; height: 36px; }
+
+  .feature, .feature--reverse { grid-template-columns: 1fr; gap: 28px; margin-bottom: 64px; }
+  .feature--reverse .feature__text { padding-left: 0; order: -1; }
+  .feature__text .two-col, .feature--reverse .feature__text .two-col { margin: 28px 0 0; }
+  .stats { margin-top: 36px; }
+
+  .subscribe { grid-template-columns: 1fr; gap: 24px; }
+  .subscribe__status { grid-column: 1; }
+  .footer-cols { grid-template-columns: 1fr 1fr; row-gap: 40px; }
+  .footer-bottom { flex-wrap: wrap; gap: 28px; margin-top: 72px; }
+  .site-footer { padding-top: 110px; }
+}
+
+@media (max-width: 520px) {
+  :root { --page-pad: 20px; }
+  .two-col { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: repeat(2, 150px); gap: 16px; }
+  .stat { width: 150px; height: 150px; padding: 0 16px; }
+}
