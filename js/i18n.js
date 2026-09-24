@@ -52,7 +52,7 @@
       'home.learn': 'Learn about<br>The Brand',
 
       /* Products */
-      'product.floor.use': 'Decking',
+      'product.floor.use': 'Cladding',
       'product.bark.use': 'Cladding | Wall Panels | Ceiling',
       'product.heartwood.use': 'Posts | Beams',
       'product.edge.use': 'Close corners',
@@ -95,11 +95,9 @@
       'footer.subscribed': 'Thank you for subscribing.',
       'footer.invalid': 'Please enter a valid email address.',
       'footer.product': 'Product',
-      'footer.projects': 'Projects',
       'footer.about': 'About',
       'footer.contact': 'Contact',
       'footer.allProducts': 'All Products',
-      'footer.item': 'Item',
       'footer.brand': 'The Brand',
       'footer.craft': 'Craftsmanship',
       'footer.sustain': 'Sustainability',
@@ -142,7 +140,7 @@
       'home.forest.body': LOREM_LONG,
       'home.learn': 'Kenali<br>Merek Kami',
 
-      'product.floor.use': 'Lantai Dek',
+      'product.floor.use': 'Pelapis Dinding',   /* matches BARK's wording; review */
       'product.bark.use': 'Pelapis Dinding | Panel Dinding | Plafon',
       'product.heartwood.use': 'Tiang | Balok',
       'product.edge.use': 'Penutup Sudut',
@@ -182,11 +180,9 @@
       'footer.subscribed': 'Terima kasih telah berlangganan.',
       'footer.invalid': 'Mohon masukkan alamat email yang valid.',
       'footer.product': 'Produk',
-      'footer.projects': 'Proyek',
       'footer.about': 'Tentang',
       'footer.contact': 'Kontak',
       'footer.allProducts': 'Semua Produk',
-      'footer.item': 'Item',
       'footer.brand': 'Tentang Merek',
       'footer.craft': 'Keahlian',
       'footer.sustain': 'Keberlanjutan',

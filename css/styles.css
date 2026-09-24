@@ -130,7 +130,9 @@ html.lenis, html.lenis body { height: auto; }
 
 /* ---------- Image box: every image lives in one ---------- */
 .img-box { position: relative; overflow: hidden; background: #cfcfc8; }
-.img-box > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+/* Videos obey the same rule: the box sets the size, the video fills it (style rule 2) */
+.img-box > img,
+.img-box > video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 /* ==========================================================================
    Header
@@ -490,6 +492,8 @@ html.lenis, html.lenis body { height: auto; }
 /* Home hero photo is a crop of cosmos_1160439100.jpeg (canopy to path, dead grass
    trimmed). 70% keeps the dancing couple and the bike above the headline. */
 .hero__media--home > img { object-position: center 70%; }
+/* The hero video is 16:9 aerial footage with no single subject, so it stays centred */
+.hero__media--home > video { object-position: center center; }
 
 /* Interactive glow (Home, style rule 1): a soft rust light that trails the pointer
    over the green-to-rust gradient. It is its own element moved with transform, not
@@ -697,7 +701,7 @@ html.lenis, html.lenis body { height: auto; }
 .subscribe__field button { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: var(--t6); letter-spacing: .04em; text-transform: uppercase; }
 .subscribe__status { grid-column: 2; font-size: var(--t6); margin-top: 8px; min-height: 1em; }
 
-.footer-cols { display: grid; grid-template-columns: 1fr 1fr 1fr 2.9fr; padding-top: 48px; }
+.footer-cols { display: grid; grid-template-columns: 1fr 1fr 3.9fr;   /* Product, About, Contact - Projects was removed */ padding-top: 48px; }
 .footer-cols h3 { font-family: var(--font-body); font-weight: 700; font-size: var(--t5); line-height: 1.2; margin-bottom: 36px; }
 .footer-cols li { font-size: var(--t5); line-height: 26px; }
 .socials { display: flex; gap: 23px; margin-top: 16px; }

@@ -7,7 +7,13 @@ get_header();
 	<main>
 		<!-- ===== Hero: rolling headline. Words are edited in assets/js/config.js ===== -->
 		<section class="hero hero--parallax" data-parallax data-hero-glow>
-			<div class="img-box hero__media hero__media--home"><img src="<?php echo esc_url( kynara_asset( 'images/hero-cosmos_1160439100.webp' ) ); ?>" alt="" fetchpriority="high"></div>
+			<!-- Background video: muted, looping, started by main.js (not `autoplay`) so reduced-motion and
+			     data-saver visitors get the still poster and never download the video. -->
+			<div class="img-box hero__media hero__media--home">
+				<video muted loop playsinline preload="none" poster="<?php echo esc_url( kynara_asset( 'images/hero-poster.webp' ) ); ?>" aria-hidden="true" data-hero-video>
+					<source src="<?php echo esc_url( kynara_asset( 'videos/hero.mp4' ) ); ?>" type="video/mp4">
+				</video>
+			</div>
 			<span class="hero__glow" aria-hidden="true"></span>
 			<span class="hero__fade" aria-hidden="true"></span>
 			<span class="hero__wash" aria-hidden="true"></span>

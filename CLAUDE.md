@@ -78,6 +78,7 @@ fonts/                Candara (display) + DM Sans (body), loaded with @font-face
      slides down and fades in (`--ui-panel-ms`). Closing reverses the order. Each state carries its own
      `transition` with a delay on whichever beat should wait; that is why the rules look duplicated.
      **Animate only `transform` and `opacity` here** — see the Done notes for why a height animation stuttered.
+   - **the Home hero video** — a muted, seamlessly looping background (`videos/hero.mp4`), started by main.js.
    - **parallax on the Home hero** — `.hero--parallax`, driven from main.js.
    - **the Home hero dissolving into the green section** — a static fade (`.hero__fade`) plus a green wash
      (`.hero__wash`) whose opacity rises with scroll. This is a scroll-linked *colour* change on the hero,
@@ -90,7 +91,7 @@ fonts/                Candara (display) + DM Sans (body), loaded with @font-face
      rhythm. Links and text buttons: the underline fades in and rises into place (offset 7px → 3px). The logo
      changes colour (green on cream/white, rust over the hero). The circle buttons invert to a cream fill with
      green text/icon. Colour and underline only — still no lifts, scales or shadows.
-2. **Every image goes inside a box:** `<div class="img-box"><img ...></div>`. The box sets the size and aspect ratio
+2. **Every image — and video — goes inside a box:** `<div class="img-box"><img ...></div>`. The box sets the size and aspect ratio
    (for example `aspect-ratio: 422 / 402`), and the image fills it with `object-fit: cover`. Never size an `<img>` directly.
 3. Flat colour only. Use the tokens in `:root`:
    `--cream #f9f8f2` (page background), `--green #0b4f37` (brand green), `--rust #a04033`, `--brown #8b5e3c`,
@@ -211,14 +212,13 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
 - Product images: all use `images/product-placeholder.jpg` (the building photo from the PDF). Replace each product's image separately.
 - Product **Measurements** are empty in the design. Put them under the Measurements `<h3>` in each `.product-card`.
 - **Colour swatches** are 12 grey circles per product. Set `style="background:#hex"` and `data-color="Name"` on each `.swatch`.
-- The footer **Projects** column shows "Item 1–5" as in the design. Swap in real project names and links.
 - **Social icons** are grey 24px squares in the design. Swap in icons and real URLs (the aria-labels are already set).
 - The phone numbers are the placeholder `+62 82 123 1234` from the design. The Terms of Use and Privacy links point to `#`.
 
 ## Decisions already made
 - The nav item is **"Products"** and opens `products.html`. The Product draft labels it "[ Projects ]"; Anderson asked for "Products" instead. If a separate Projects (portfolio) page arrives, create `projects.html` and add it as its own nav item — don't rename this one back.
 - Two typos from the drafts were corrected: "Craftsmenship" → "Craftsmanship" and "post-customer" → "post-consumer".
-- Image mapping: Home hero = `hero-cosmos_1160439100.webp` (a crop — see Done), The Brand hero = `kids in forest.jpeg`, both under a green-to-rust gradient overlay; Craftsmanship = `meeting ith forest.jpeg`; Sustainable = `cosmos_789092184.jpeg`; Limitless Applications = `cosmos_969656075.jpeg`.
+- Image mapping: Home hero = **video** `videos/hero.mp4` with poster `images/hero-poster.webp` (see Done; the old hero photo `hero-cosmos_1160439100.webp` is no longer used on Home), The Brand hero = `kids in forest.jpeg`, both under a green-to-rust gradient overlay; Craftsmanship = `meeting ith forest.jpeg`; Sustainable = `cosmos_789092184.jpeg`; Limitless Applications = `cosmos_969656075.jpeg`.
 - The file names contain spaces, so they are URL-encoded in the HTML (`%20`). If you rename images, update the paths.
 - SEARCH opens a simple panel that filters a small index in main.js (`SEARCH_INDEX`). Add new pages or products to that index.
 - Breakpoints: 1180px (tightens the grids) and 900px (mobile: MENU toggle, everything stacks), plus 520px.
@@ -310,8 +310,22 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
 - **Interactive glow on the Home hero** (`.hero__glow`, `data-hero-glow`): a soft rust radial light, moved with
   `transform` so following the pointer costs no repaint, eased toward the cursor at 8% per frame. The rAF loop
   stops once it has caught up. Touch, reduced motion and JS-off all get the static off-centre glow.
+- **Home hero is a video.** `videos/hero-vid.mp4` is Anderson's original (untouched). `videos/hero.mp4` is the web
+  version: the 10s clip made into a **seamless 9s loop** by dissolving its last second into its first (the raw
+  clip's end and start don't match, so a plain loop jumped), re-encoded H.264 CRF 26, no audio, the editor's
+  timecode track dropped, index at the front (faststart) — 1.8MB vs 6.4MB, visually identical at full size.
+  `images/hero-poster.webp` is the loop's first frame, so still → moving has no jump.
+  The `<video>` has **no `autoplay`** and `preload="none"` on purpose: main.js starts it only when motion is
+  welcome, so reduced-motion and data-saver visitors see the poster and never download the file. It pauses
+  while the hero is off screen. Parallax, glow, fade and wash all still apply (the video sits in the same
+  `.img-box`). To swap the clip: re-encode the same way and regenerate the poster from frame 0. With ffmpeg:
+  `trim=start=1` and `trim=end=1` fed into `xfade=transition=fade:duration=1:offset=<length − 2>`, then
+  `-crf 26 -an -movflags +faststart`. Same files in the theme under `assets/videos/` and `assets/images/`.
+- **Footer Projects column removed** (it only ever held the placeholder "Item 1–5"). The footer grid is now three
+  columns — `1fr 1fr 3.9fr`, so Product and About keep their old width and Contact takes the rest — and the
+  `footer.projects` / `footer.item` dictionary keys went with it. Done in the static pages and the theme.
 - **Nav "Projects" renamed "Products"** (and the key `nav.projects` → `nav.products`, ID "Proyek" → "Produk").
-  The footer's **Projects** column is a different thing — a future portfolio list — and was left alone.
+  The footer's Projects column was later **removed altogether** at Anderson's request (see above).
 - **Search field has a magnifier** (`.search-field__icon`) sitting inside the input on the left; the input is
   padded to clear it. Present on all four pages.
 - **The SEARCH button in the nav has a magnifier too**, beside the label. The label is a separate

@@ -85,7 +85,13 @@
   <main>
     <!-- ===== Hero: rolling headline. Words are edited in js/config.js ===== -->
     <section class="hero hero--parallax" data-parallax data-hero-glow>
-      <div class="img-box hero__media hero__media--home"><img src="images/hero-cosmos_1160439100.webp" alt="" fetchpriority="high"></div>
+      <!-- Background video: muted, looping, started by main.js (not `autoplay`) so reduced-motion and
+           data-saver visitors get the still poster and never download the video. -->
+      <div class="img-box hero__media hero__media--home">
+        <video muted loop playsinline preload="none" poster="images/hero-poster.webp" aria-hidden="true" data-hero-video>
+          <source src="videos/hero.mp4" type="video/mp4">
+        </video>
+      </div>
       <span class="hero__glow" aria-hidden="true"></span>
       <span class="hero__fade" aria-hidden="true"></span>
       <span class="hero__wash" aria-hidden="true"></span>
@@ -176,17 +182,6 @@
             <li><a href="products.html#heartwood">Heartwood</a></li>
             <li><a href="products.html#edge">Edge</a></li>
             <li><a href="products.html" data-i18n="footer.allProducts">All Products</a></li>
-          </ul>
-        </div>
-        <div>
-          <h3 data-i18n="footer.projects">Projects</h3>
-          <!-- Placeholder list, as in the design: replace with real project names/links -->
-          <ul>
-            <li><a href="products.html"><span data-i18n="footer.item">Item</span> 1</a></li>
-            <li><a href="products.html"><span data-i18n="footer.item">Item</span> 2</a></li>
-            <li><a href="products.html"><span data-i18n="footer.item">Item</span> 3</a></li>
-            <li><a href="products.html"><span data-i18n="footer.item">Item</span> 4</a></li>
-            <li><a href="products.html"><span data-i18n="footer.item">Item</span> 5</a></li>
           </ul>
         </div>
         <div>

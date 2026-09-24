@@ -28,15 +28,6 @@ $kynara_brand = kynara_page_url( 'brand' );
 					</ul>
 				</div>
 				<div>
-					<h3 data-i18n="footer.projects">Projects</h3>
-					<!-- Placeholder list, as in the design: replace with real project names/links -->
-					<ul>
-						<?php for ( $kynara_i = 1; $kynara_i <= 5; $kynara_i++ ) : ?>
-							<li><a href="<?php echo esc_url( kynara_page_url( 'products' ) ); ?>"><span data-i18n="footer.item">Item</span> <?php echo (int) $kynara_i; ?></a></li>
-						<?php endfor; ?>
-					</ul>
-				</div>
-				<div>
 					<h3 data-i18n="footer.about">About</h3>
 					<ul>
 						<li><a href="<?php echo esc_url( $kynara_brand ); ?>" data-i18n="footer.brand">The Brand</a></li>

@@ -9,6 +9,7 @@
    7. Interactive hero glow (Home)
    8. Shrinking header
    9. Smooth scrolling (Lenis)
+  10. Hero video (Home)
    Still no reveal / fade-in-on-scroll effects: see style rule 1 in CLAUDE.md
    for the motion that is allowed.
    ========================================================================== */
@@ -500,6 +501,32 @@
       anchors: true,
       allowNestedScroll: true
     });
+  }
+
+  /* ---------- 10. Hero video (Home) ---------- */
+  // The <video> has no autoplay attribute and preload="none": it only downloads and
+  // plays once this confirms motion is welcome. Reduced-motion and data-saver visitors
+  // keep the still poster (the loop's first frame) and never fetch the file.
+  // It also pauses whenever the hero is off screen, so it isn't decoding a video
+  // nobody can see while they read the rest of the page.
+  var heroVideo = document.querySelector('[data-hero-video]');
+  if (heroVideo) {
+    var saveData = !!(navigator.connection && navigator.connection.saveData);
+    var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!calm && !saveData) {
+      var playHero = function () {
+        var p = heroVideo.play();
+        if (p && p.catch) p.catch(function () { /* autoplay refused: the poster stays */ });
+      };
+      var heroBox = heroVideo.closest('.hero') || heroVideo;
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) { if (e.isIntersecting) playHero(); else heroVideo.pause(); });
+        }).observe(heroBox);
+      } else {
+        playHero();
+      }
+    }
   }
 
   /* ---------- Go ---------- */
