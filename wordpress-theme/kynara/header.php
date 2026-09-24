@@ -4,7 +4,8 @@
  * light cream bar) and the current nav item are worked out here.
  */
 $kynara_page    = kynara_current_page();
-$kynara_overlay = in_array( $kynara_page, array( 'home', 'brand' ), true );
+// Only Home has a hero for the header to sit over. The Brand lost its hero and uses the light bar.
+$kynara_overlay = ( 'home' === $kynara_page );
 $kynara_keys    = array(
 	'home'     => array( 'meta.title.home', 'meta.desc.home' ),
 	'products' => array( 'meta.title.products', 'meta.desc.products' ),

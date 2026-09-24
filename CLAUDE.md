@@ -84,6 +84,9 @@ fonts/                Candara (display) + DM Sans (body), loaded with @font-face
      (`.hero__wash`) whose opacity rises with scroll. This is a scroll-linked *colour* change on the hero,
      not content revealing itself, so the ban on scroll-reveal still stands.
    - **an interactive glow on the Home hero** — `.hero__glow`, a soft rust light that eases after the pointer.
+   - **the stats on The Brand counting** — once, when they come into view: up from 0, except deforestation,
+     which counts *down* from 250 to 0. This is the one thing triggered by scrolling into view, and it was
+     asked for; it animates numbers, it doesn't reveal content (the final values are in the HTML all along).
    - **the header shrinking on scroll** (`--shrink-ms`), with the wordmark retracting to the logomark.
    - **the header sliding away at the footer** (`.is-hidden`) and back as you scroll up out of it.
    - **Lenis smooth scrolling** on wheel/trackpad, every page. Touch stays native.
@@ -131,8 +134,8 @@ fonts/                Candara (display) + DM Sans (body), loaded with @font-face
    Buttons follow the same bracket style (`.btn-bracket`).
 7. The header is **`position: fixed` on every page** and shrinks once the page scrolls past 40px (`.is-scrolled`,
    from main.js). There are two variants at the top of the page:
-   - `site-header--overlay`: sits over the hero (Home and The Brand). Transparent, cream text, no rule.
-   - `site-header--light`: cream background with a 1px rule under it (Products and Contact). Dark text.
+   - `site-header--overlay`: sits over the hero — **Home only** now. Transparent, cream text, no rule.
+   - `site-header--light`: cream background with a 1px rule under it (Products, The Brand, Contact). Dark text.
    Once scrolled, both look the same: a short cream bar, dark text, logomark only, and **no rule**. The rule
    only reappears while the search panel is open. Once the footer is 30% of the way up the screen the header
    slides away entirely, and returns when you scroll back up. Fixed rather than sticky on purpose — see the Done notes.
@@ -163,7 +166,7 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
 - `forced-colors` (Windows high contrast) gets its own rule, because that mode replaces backgrounds and would
   otherwise erase the logo.
 
-## Rolling hero word (Home + The Brand)
+## Rolling hero word (Home only — The Brand's hero was replaced by a title + banner)
 - **This headline is a brand line and is NOT translated.** It reads "Crafted for *Harmonious* ___" in both
   languages, so the hero never reflows when the language changes. `heroRoller` therefore has **one** word list,
   not one per language, and `hero.static` is deliberately identical in the `en` and `id` dictionaries.
@@ -218,7 +221,7 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
 ## Decisions already made
 - The nav item is **"Products"** and opens `products.html`. The Product draft labels it "[ Projects ]"; Anderson asked for "Products" instead. If a separate Projects (portfolio) page arrives, create `projects.html` and add it as its own nav item — don't rename this one back.
 - Two typos from the drafts were corrected: "Craftsmenship" → "Craftsmanship" and "post-customer" → "post-consumer".
-- Image mapping: Home hero = **video** `videos/hero.mp4` with poster `images/hero-poster.webp` (see Done; the old hero photo `hero-cosmos_1160439100.webp` is no longer used on Home), The Brand hero = `kids in forest.jpeg`, both under a green-to-rust gradient overlay; Craftsmanship = `meeting ith forest.jpeg`; Sustainable = `cosmos_789092184.jpeg`; Limitless Applications = `cosmos_969656075.jpeg`.
+- Image mapping: Home hero = **video** `videos/hero.mp4` with poster `images/hero-poster.webp` (see Done; the old hero photo `hero-cosmos_1160439100.webp` is no longer used on Home), The Brand banner = `images/brand-banner.webp` (see Done; `kids in forest` is no longer used); Craftsmanship = `meeting ith forest.jpeg`; Sustainable = `cosmos_789092184.jpeg`; Limitless Applications = `cosmos_969656075.jpeg`.
 - The file names contain spaces, so they are URL-encoded in the HTML (`%20`). If you rename images, update the paths.
 - SEARCH opens a simple panel that filters a small index in main.js (`SEARCH_INDEX`). Add new pages or products to that index.
 - Breakpoints: 1180px (tightens the grids) and 900px (mobile: MENU toggle, everything stacks), plus 520px.
@@ -226,7 +229,8 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
 ## Before launch
 - **Font licensing:** Candara is a Microsoft font, and its standard licence may not allow web embedding. Confirm a webfont licence or pick a licensed alternative. DM Sans is open source (OFL). **Still open — this is the real blocker.**
 - **Confirm the domain.** The canonical and `og:` URLs are hardcoded to `https://kynara.co.id` (inferred from the enquiries address). If the live domain differs, update `<link rel="canonical">` and `og:url` in all four pages.
-- **The Brand hero image is too small.** `kids in forest.jpeg` is 736x1109 but now covers a full-viewport hero — well over a 2x upscale on a typical laptop, so it looks soft. Home has been moved to a larger photo; The Brand still needs one (1600px+ wide, then re-export to `.webp`).
+- ~~The Brand hero image is too small~~ — resolved: The Brand no longer has a hero (see Done). The banner that
+  replaced it is 1440px wide; on very large screens (container over ~1440px) it will soften slightly.
 
 ### Done (September 2026)
 - **Meta + social:** every page now has its own real `<meta name="description">`, plus Open Graph, `twitter:card` and `rel="canonical"`. The social card is `images/og-kynara.jpg` (1200x630: the placeholder building photo under the hero's green-to-rust scrim, with the light logotype).
@@ -321,6 +325,22 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   `.img-box`). To swap the clip: re-encode the same way and regenerate the poster from frame 0. With ffmpeg:
   `trim=start=1` and `trim=end=1` fed into `xfade=transition=fade:duration=1:offset=<length − 2>`, then
   `-crf 26 -an -movflags +faststart`. Same files in the theme under `assets/videos/` and `assets/images/`.
+- **The Brand: hero replaced by a title and a banner.** The full-height hero (photo + rolling headline) is gone.
+  In its place, `.brand-intro`: a two-line T1 title, "Sustainable composites for / floors, walls and structures"
+  (`brand.intro.title`, ID "Komposit berkelanjutan untuk / lantai, dinding, dan struktur" — review), then a banner
+  across the container (`.brand-intro__media`, 21:9 on desktop, 4:3 on phones). The banner is a 4:3 crop of
+  `cosmos_1160439100.jpeg` centred on the dancing couple (`images/brand-banner.webp`, 1440×1080, 301KB) —
+  chosen because it's the only unused photo wide enough (1440px) for a full-container image.
+  Because there's no hero to sit over, **The Brand now uses the light header** (static `brand.html` and
+  `header.php`, where only Home is an overlay page). `.brand-intro__title` joined the Candara tracking group.
+- **Stats count when they come into view** (The Brand, `main.js` section 11). Each `.stat__value` has
+  `data-count-from` / `data-count-to` and optional `data-count-prefix` / `data-count-suffix` (so "~600kg" is
+  prefix `~`, to `600`, suffix `kg`). **The HTML keeps the final value**, so search engines, JS-off and
+  reduced-motion visitors see the real numbers; JS resets them to their start value and counts once when the
+  `.stats` list is half on screen — 1.8s, ease-out, each stat 150ms after the last. Deforestation runs 250 → 0
+  so the zero lands as the point. `font-variant-numeric: tabular-nums` stops the figures wobbling as they change.
+  **If a stat's number changes, update both the text and `data-count-to`** — the text is what non-animated
+  visitors see, the attribute is where the count ends.
 - **Footer Projects column removed** (it only ever held the placeholder "Item 1–5"). The footer grid is now three
   columns — `1fr 1fr 3.9fr`, so Product and About keep their old width and Contact takes the rest — and the
   `footer.projects` / `footer.item` dictionary keys went with it. Done in the static pages and the theme.

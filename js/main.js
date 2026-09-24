@@ -10,6 +10,7 @@
    8. Shrinking header
    9. Smooth scrolling (Lenis)
   10. Hero video (Home)
+  11. Counting stats (The Brand)
    Still no reveal / fade-in-on-scroll effects: see style rule 1 in CLAUDE.md
    for the motion that is allowed.
    ========================================================================== */
@@ -535,6 +536,50 @@
         playHero();
       }
     }
+  }
+
+  /* ---------- 11. Counting stats (The Brand) ---------- */
+  // Each .stat__value carries data-count-from / -to (plus optional -prefix / -suffix).
+  // The HTML already holds the FINAL value, so search engines, JS-off and
+  // reduced-motion visitors simply see the real numbers. Otherwise the values are
+  // reset to their start and count once, when the stats come into view: up from 0,
+  // except deforestation, which counts DOWN from 250 so the zero lands as the point.
+  // They start a beat apart and ease out, rather than ticking at a constant rate.
+  var statGroups = document.querySelectorAll('.stats');
+  if (statGroups.length && 'IntersectionObserver' in window &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    var countText = function (el, v) {
+      return (el.getAttribute('data-count-prefix') || '') + Math.round(v) + (el.getAttribute('data-count-suffix') || '');
+    };
+    var countUp = function (el, delay) {
+      var from = parseFloat(el.getAttribute('data-count-from') || '0');
+      var to = parseFloat(el.getAttribute('data-count-to'));
+      var duration = 1800;
+      var start = null;
+      var step = function (now) {
+        if (start === null) start = now + delay;
+        var t = Math.min(Math.max((now - start) / duration, 0), 1);
+        var eased = 1 - Math.pow(1 - t, 4);              // ease-out quart
+        el.textContent = countText(el, from + (to - from) * eased);
+        if (t < 1) window.requestAnimationFrame(step);
+      };
+      window.requestAnimationFrame(step);
+    };
+    var statsObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        statsObserver.unobserve(entry.target);            // once only
+        entry.target.querySelectorAll('[data-count-to]').forEach(function (el, i) {
+          countUp(el, i * 150);
+        });
+      });
+    }, { threshold: 0.5 });
+    statGroups.forEach(function (group) {
+      group.querySelectorAll('[data-count-to]').forEach(function (el) {
+        el.textContent = countText(el, parseFloat(el.getAttribute('data-count-from') || '0'));
+      });
+      statsObserver.observe(group);
+    });
   }
 
   /* ---------- Go ---------- */

@@ -5,11 +5,11 @@
 get_header();
 ?>
 	<main>
-		<!-- ===== Hero: rolling headline. Words are edited in assets/js/config.js ===== -->
-		<section class="hero hero--brand">
-			<div class="img-box hero__media"><img src="<?php echo esc_url( kynara_asset( 'images/kids-in-forest.webp' ) ); ?>" alt="" fetchpriority="high"></div>
-			<div class="wrap hero__content">
-				<h1 class="hero__title" data-roller aria-label="Crafted for Harmonious Living">Crafted for <em>Harmonious</em> Living</h1>
+		<!-- ===== Intro: what KYNARA makes, then a banner across the container (replaced the hero) ===== -->
+		<section class="brand-intro">
+			<div class="wrap">
+				<h1 class="brand-intro__title" data-i18n-html="brand.intro.title">Sustainable composites for<br>floors, walls and structures</h1>
+				<div class="img-box brand-intro__media"><img src="<?php echo esc_url( kynara_asset( 'images/brand-banner.webp' ) ); ?>" alt="A couple dancing on a sunlit forest path beside a bicycle" fetchpriority="high"></div>
 			</div>
 		</section>
 
@@ -32,10 +32,10 @@ get_header();
 						<div>
 							<h2 class="feature__title" data-i18n-html="brand.sustain.title">The Sustainable<br>Alternatives</h2>
 							<ul class="stats">
-								<li class="stat"><span class="stat__value">60%</span><span class="stat__label" data-i18n="brand.stat1">rice husk from local farms</span></li>
-								<li class="stat"><span class="stat__value">30%</span><span class="stat__label" data-i18n="brand.stat2">recycled plastic post-consumer</span></li>
-								<li class="stat"><span class="stat__value">~600kg</span><span class="stat__label" data-i18n="brand.stat3">plastic saved from production</span></li>
-								<li class="stat"><span class="stat__value">0</span><span class="stat__label" data-i18n="brand.stat4">deforestation for production of goods</span></li>
+								<li class="stat"><span class="stat__value" data-count-from="0" data-count-to="60" data-count-suffix="%">60%</span><span class="stat__label" data-i18n="brand.stat1">rice husk from local farms</span></li>
+								<li class="stat"><span class="stat__value" data-count-from="0" data-count-to="30" data-count-suffix="%">30%</span><span class="stat__label" data-i18n="brand.stat2">recycled plastic post-consumer</span></li>
+								<li class="stat"><span class="stat__value" data-count-prefix="~" data-count-from="0" data-count-to="600" data-count-suffix="kg">~600kg</span><span class="stat__label" data-i18n="brand.stat3">plastic saved from production</span></li>
+								<li class="stat"><span class="stat__value" data-count-from="250" data-count-to="0">0</span><span class="stat__label" data-i18n="brand.stat4">deforestation for production of goods</span></li>
 							</ul>
 						</div>
 						<div class="two-col">

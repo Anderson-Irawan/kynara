@@ -60,6 +60,7 @@
       'product.colors': 'Color variants',
 
       /* The Brand */
+      'brand.intro.title': 'Sustainable composites for<br>floors, walls and structures',
       'brand.craft.title': 'Layers of<br>Craftsmanship',
       'brand.craft.a': LOREM_A,
       'brand.craft.b': LOREM_B,
@@ -147,6 +148,7 @@
       'product.measurements': 'Ukuran',
       'product.colors': 'Varian Warna',
 
+      'brand.intro.title': 'Komposit berkelanjutan untuk<br>lantai, dinding, dan struktur',
       'brand.craft.title': 'Lapisan<br>Keahlian',
       'brand.craft.a': LOREM_A,
       'brand.craft.b': LOREM_B,

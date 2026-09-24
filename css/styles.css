@@ -124,7 +124,7 @@ html.lenis, html.lenis body { height: auto; }
 
 /* ---------- Every place Candara is used, tracked in by 4% ---------- */
 .hero__title, .section-title, .story h2, .product-card__name, .product-card__use,
-.feature__title, .stat__value, .contact__title, .subscribe h2 {
+.feature__title, .stat__value, .contact__title, .subscribe h2, .brand-intro__title {
   letter-spacing: var(--tracking-display);
 }
 
@@ -625,6 +625,14 @@ html.lenis, html.lenis body { height: auto; }
 /* ==========================================================================
    The Brand page
    ========================================================================== */
+/* Intro: a two-line title saying what KYNARA makes, then a banner across the container.
+   It replaced the full-height hero this page used to share with Home, which is why
+   The Brand now uses the light header. The banner is a 4:3 crop of cosmos_1160439100
+   centred on the couple; desktop shows a wide 21:9 band of it, phones the fuller 4:3. */
+.brand-intro { padding: 100px 0 64px; }
+.brand-intro__title { font-family: var(--font-display); font-weight: 400; font-size: var(--t1); line-height: 1.05; }
+.brand-intro__media { aspect-ratio: 21 / 9; margin-top: 56px; }
+
 .brand-body { padding: 44px 0 0; }
 .feature { display: grid; grid-template-columns: 1fr 1.55fr; gap: 60px; margin-bottom: 55px; }
 .feature--reverse { grid-template-columns: 1.07fr 1fr; }
@@ -643,7 +651,8 @@ html.lenis, html.lenis body { height: auto; }
   display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
   padding: 0 22px;
 }
-.stat__value { font-family: var(--font-display); font-size: var(--t3); line-height: 1; }
+/* tabular figures: every digit the same width, so a number doesn't wobble as it counts */
+.stat__value { font-family: var(--font-display); font-size: var(--t3); line-height: 1; font-variant-numeric: tabular-nums; }
 .stat__label { font-size: var(--t6); line-height: 1.2; margin-top: 12px; }
 .feature--last { margin-bottom: 0; padding-bottom: 60px; }
 
@@ -723,6 +732,8 @@ html.lenis, html.lenis body { height: auto; }
 }
 
 @media (max-width: 900px) {
+  .brand-intro { padding: 56px 0 40px; }
+  .brand-intro__media { aspect-ratio: 4 / 3; margin-top: 32px; }
   :root { --header-h: 88px; --header-h-small: 60px; --page-pad: 32px; }
   .site-header__bar { grid-template-columns: auto 1fr auto; gap: 16px; }
     .brand-logo { --logo-w: 130px; }
