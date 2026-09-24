@@ -484,12 +484,46 @@
       window.requestAnimationFrame(placeHeader);
     }, { passive: true });
     window.addEventListener('resize', placeHeader);
-    // A page opened mid-scroll (a #anchor link, a reload) starts shrunk, without
-    // playing the shrink animation on load.
+    // Carry the header's state across pages, the way vestre.com does. As a page is
+    // left, remember whether the bar was shrunk. If the next page opens at the top,
+    // it starts shrunk too - instantly, before anything is painted - and then grows
+    // back out with the normal grow animation, instead of simply appearing full
+    // size. The note expires after a few seconds, so leaving the site and coming
+    // back later in the same tab doesn't replay it. Skipped under reduced motion,
+    // where the transitions are off and it would only flash.
+    var CARRY_KEY = 'kynara-header-carry';
+    var calmHeader = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.addEventListener('pagehide', function () {
+      try {
+        if (siteHeader.classList.contains('is-scrolled')) {
+          window.sessionStorage.setItem(CARRY_KEY, String(Date.now()));
+        } else {
+          window.sessionStorage.removeItem(CARRY_KEY);
+        }
+      } catch (e) { /* storage blocked: the header just appears full size */ }
+    });
+    var carried = false;
+    try {
+      var carriedAt = Number(window.sessionStorage.getItem(CARRY_KEY));
+      window.sessionStorage.removeItem(CARRY_KEY);
+      carried = !calmHeader && carriedAt > 0 && Date.now() - carriedAt < 5000 && window.pageYOffset <= 40;
+    } catch (e) { /* ignore */ }
+
+    // First paint without animation. A page opened mid-scroll (a #anchor link, a
+    // reload) simply starts shrunk; a carried-over page starts shrunk on purpose.
     siteHeader.classList.add('is-instant');
-    placeHeader();
+    if (carried) {
+      siteHeader.classList.add('is-scrolled');
+    } else {
+      placeHeader();
+    }
     window.requestAnimationFrame(function () {
-      window.requestAnimationFrame(function () { siteHeader.classList.remove('is-instant'); });
+      window.requestAnimationFrame(function () {
+        siteHeader.classList.remove('is-instant');
+        // One more frame, so the grow is a real transition rather than part of
+        // the first paint. placeHeader() sees the page at the top and grows it.
+        if (carried) window.requestAnimationFrame(placeHeader);
+      });
     });
   }
 

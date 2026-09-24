@@ -66,6 +66,15 @@ $kynara_brand = kynara_page_url( 'brand' );
 		</div>
 	</footer>
 
+	<?php if ( 'contact' !== kynara_current_page() ) : // not on the page it points to ?>
+	<!-- ===== Contact button: fixed bottom-right on every page except Contact ===== -->
+	<a class="chat-fab" href="<?php echo esc_url( kynara_page_url( 'contact' ) ); ?>" data-i18n-aria="fab.contact" aria-label="Contact us">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true">
+			<path d="M5 4.5h14A1.5 1.5 0 0 1 20.5 6v9a1.5 1.5 0 0 1-1.5 1.5h-8.5L6 20v-3.5H5A1.5 1.5 0 0 1 3.5 15V6A1.5 1.5 0 0 1 5 4.5z"/>
+		</svg>
+	</a>
+	<?php endif; ?>
+
 <?php wp_footer(); ?>
 </body>
 </html>

@@ -554,7 +554,7 @@ html.lenis, html.lenis body { height: auto; }
   .site-header__bar::after,
   .main-nav a, .search-toggle, .menu-toggle, .lang-switch__toggle, .lang-switch__menu button,
   .btn-bracket, .subscribe__field button, .footer-cols a, .footer-bottom a,
-  .collection__item h3, .brand-logo::before, .circle-btn,
+  .collection__item h3, .brand-logo::before, .circle-btn, .chat-fab,
   .site-header, .site-header.is-hidden:not(:focus-within),
   .site-header__bar, .brand-logo, .site-header .brand-logo::after,
   .site-header--overlay.is-search-closing .site-header__bar,
@@ -721,6 +721,30 @@ html.lenis, html.lenis body { height: auto; }
 .footer-bottom nav { display: flex; gap: 58px; font-weight: 700; font-size: var(--t5); }
 
 /* ==========================================================================
+   Contact button: fixed bottom-right on every page except Contact
+   Solid green with a cream icon so it reads over the video and the cream pages.
+   The 1px cream ring disappears on cream but gives it an edge over the green Home
+   section, where green on green would otherwise vanish. No shadow (style rule 1).
+   Hover inverts it, on the same eased curve as every other hover.
+   ========================================================================== */
+.chat-fab {
+  position: fixed; right: 32px; bottom: 32px; z-index: 15;   /* under the header (20) */
+  display: flex; align-items: center; justify-content: center;
+  width: 64px; height: 64px; border-radius: 50%;
+  background-color: var(--green); color: var(--cream);
+  border: 1px solid var(--cream);
+  transition:
+    background-color var(--hover-ms) var(--ui-enter),
+    color var(--hover-ms) var(--ui-enter),
+    border-color var(--hover-ms) var(--ui-enter);
+}
+.chat-fab svg { width: 26px; height: 26px; display: block; }
+.chat-fab:hover { background-color: var(--cream); color: var(--green); border-color: var(--green); }
+/* The site's focus ring uses currentColor, which is cream here and would vanish on
+   the cream pages - so this one is drawn in ink */
+.chat-fab:focus-visible { outline: 1px solid var(--ink); outline-offset: 4px; }
+
+/* ==========================================================================
    Responsive
    ========================================================================== */
 @media (max-width: 1180px) {
@@ -732,6 +756,7 @@ html.lenis, html.lenis body { height: auto; }
 }
 
 @media (max-width: 900px) {
+  .chat-fab { right: 20px; bottom: 20px; width: 56px; height: 56px; }
   .brand-intro { padding: 56px 0 40px; }
   .brand-intro__media { aspect-ratio: 4 / 3; margin-top: 32px; }
   :root { --header-h: 88px; --header-h-small: 60px; --page-pad: 32px; }

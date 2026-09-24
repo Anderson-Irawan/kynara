@@ -1,0 +1,9 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "landingPage": "/",
+  "steps": [
+    { "step": "installPlugin", "pluginData": { "resource": "wordpress.org/plugins", "slug": "secure-custom-fields" } },
+    { "step": "activateTheme", "themeFolderName": "kynara" },
+    { "step": "setSiteOptions", "options": { "permalink_structure": "/%postname%/", "blogname": "KYNARA" } }
+  ]
+}

@@ -87,7 +87,8 @@ fonts/                Candara (display) + DM Sans (body), loaded with @font-face
    - **the stats on The Brand counting** — once, when they come into view: up from 0, except deforestation,
      which counts *down* from 250 to 0. This is the one thing triggered by scrolling into view, and it was
      asked for; it animates numbers, it doesn't reveal content (the final values are in the HTML all along).
-   - **the header shrinking on scroll** (`--shrink-ms`), with the wordmark retracting to the logomark.
+   - **the header shrinking on scroll** (`--shrink-ms`), with the wordmark retracting to the logomark — and
+     **growing back out on the next page** when you navigate while it's shrunk (after vestre.com).
    - **the header sliding away at the footer** (`.is-hidden`) and back as you scroll up out of it.
    - **Lenis smooth scrolling** on wheel/trackpad, every page. Touch stays native.
    - **hover, eased** — every hover uses `--hover-ms` on the `--ui-enter` curve so the page moves with one
@@ -333,6 +334,22 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   chosen because it's the only unused photo wide enough (1440px) for a full-container image.
   Because there's no hero to sit over, **The Brand now uses the light header** (static `brand.html` and
   `header.php`, where only Home is an overlay page). `.brand-intro__title` joined the Candara tracking group.
+- **Floating contact button** (`.chat-fab`): a 64px circle fixed bottom-right (56px and closer in on phones) with a
+  chat-bubble icon, linking to Contact, on **every page except Contact**. Solid `--green` with a cream icon and a
+  1px cream ring — the ring is what keeps it visible over the green Home section. Hover inverts it on the standard
+  eased hover. Its focus ring is drawn in ink, because the site's default `currentColor` ring would be cream and
+  vanish on cream pages. `z-index: 15`, under the header. Label: `fab.contact` ("Contact us" / "Hubungi kami").
+  In the static site it's pasted after `</footer>` in index, products and brand (**not** contact); in the theme,
+  `footer.php` shows it unless `kynara_current_page()` is `'contact'`.
+- **The header carries its state across pages** (main.js section 8, both copies). On `pagehide`, if the bar is
+  shrunk, a timestamp goes into `sessionStorage` (`kynara-header-carry`). The next page, *if it opens at the top*
+  and the note is under 5s old, paints the bar shrunk with `.is-instant` (no transition), re-enables transitions
+  two frames later, then calls `placeHeader()` one frame after that — so the normal grow animation plays: height,
+  wordmark sliding back out, and on Home the cream bar fading to transparent. **Keep that frame order**: dropping
+  `.is-instant` and `.is-scrolled` in the same frame makes the grow skip. Pages opened mid-scroll stay shrunk;
+  reduced motion skips it; a stale note (left the site and came back) is ignored. View Transitions were considered
+  and rejected: no Firefox support, and they animate snapshots of the header rather than the header itself.
+  (Verified frame by frame in jsdom — see the September session.)
 - **Stats count when they come into view** (The Brand, `main.js` section 11). Each `.stat__value` has
   `data-count-from` / `data-count-to` and optional `data-count-prefix` / `data-count-suffix` (so "~600kg" is
   prefix `~`, to `600`, suffix `kg`). **The HTML keeps the final value**, so search engines, JS-off and
