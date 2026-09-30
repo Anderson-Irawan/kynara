@@ -357,7 +357,7 @@
       var body = 'Name: ' + data.get('name') + '\n' +
         'Company: ' + (data.get('company') || '-') + '\n' +
         'Email: ' + data.get('email') + '\n\n' + data.get('message');
-      window.location.href = 'mailto:' + (cfg.email || 'enquiries@kynara.co.id') +
+      window.location.href = 'mailto:' + (cfg.email || 'enquiries@kynara.id') +
         '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
       status.textContent = t('contact.mailto');
     });
@@ -696,6 +696,33 @@
       card.addEventListener('pointerleave', function () { tx = 0; ty = 0; startTilt(); });
     });
   }
+
+  /* ---------- 15. Product options: Colour and Finishing (Products page) ---------- */
+  // Each .pick__list is a radio group of rows (after vestre.com's material lists): clicking a
+  // row selects it; arrow keys move through the group like native radios, and only the
+  // chosen row is in the tab order.
+  document.querySelectorAll('.pick__list').forEach(function (list) {
+    var rows = Array.prototype.slice.call(list.querySelectorAll('.pick__row'));
+    function choose(row, focus) {
+      rows.forEach(function (r) {
+        var on = r === row;
+        r.classList.toggle('is-selected', on);
+        r.setAttribute('aria-checked', on ? 'true' : 'false');
+        r.tabIndex = on ? 0 : -1;
+      });
+      if (focus) row.focus();
+    }
+    rows.forEach(function (row, i) {
+      row.tabIndex = row.classList.contains('is-selected') ? 0 : -1;
+      row.addEventListener('click', function () { choose(row); });
+      row.addEventListener('keydown', function (e) {
+        var d = (e.key === 'ArrowDown' || e.key === 'ArrowRight') ? 1 : (e.key === 'ArrowUp' || e.key === 'ArrowLeft') ? -1 : 0;
+        if (!d) return;
+        e.preventDefault();
+        choose(rows[(i + d + rows.length) % rows.length], true);
+      });
+    });
+  });
 
   /* ---------- Go ---------- */
   applyLang(currentLang);

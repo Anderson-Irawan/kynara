@@ -102,11 +102,21 @@ add_action( 'acf/include_fields', function () {
 				'type'         => 'repeater',
 				'layout'       => 'table',
 				'button_label' => 'Add colour',
-				'instructions' => 'Each colour shows as a swatch. Until any are added, the page shows grey placeholders.',
+				'instructions' => 'Each colour is a row in the product\'s Colour list (swatch + name). The list is hidden until at least one is added.',
 				'sub_fields'   => array(
 					array( 'key' => 'field_kynara_c_name', 'name' => 'name', 'label' => 'Name', 'type' => 'text' ),
 					array( 'key' => 'field_kynara_c_colour', 'name' => 'colour', 'label' => 'Colour', 'type' => 'color_picker' ),
 				),
+			),
+			array(
+				'key'           => 'field_kynara_finishing',
+				'name'          => 'kynara_finishing',
+				'label'         => 'Finishing',
+				'type'          => 'checkbox',
+				'choices'       => array( 'sanding' => 'Sanding', 'wirebrush' => 'Wirebrush' ),
+				'default_value' => array( 'sanding', 'wirebrush' ),
+				'layout'        => 'horizontal',
+				'instructions'  => 'The finishes this product comes in; they show as the Finishing list beside the colours.',
 			),
 		),
 	) );
@@ -208,6 +218,23 @@ function kynara_product_colours( $post_id ) {
 	return $out;
 }
 
+/**
+ * The finishes a product comes in, as array( 'key' => ..., 'label' => ... ), in a fixed order.
+ * A product whose Finishing box has never been saved gets both (the field's default).
+ */
+function kynara_product_finishing( $post_id ) {
+	$labels = array( 'sanding' => 'Sanding', 'wirebrush' => 'Wirebrush' );
+	$saved  = metadata_exists( 'post', $post_id, 'kynara_finishing' ) ? kynara_field( 'kynara_finishing', $post_id ) : array_keys( $labels );
+	$saved  = is_array( $saved ) ? $saved : array_filter( array( $saved ) );
+	$out    = array();
+	foreach ( $labels as $key => $label ) {
+		if ( in_array( $key, $saved, true ) ) {
+			$out[] = array( 'key' => $key, 'label' => $label );
+		}
+	}
+	return $out;
+}
+
 /** The product's anchor on the Products page. */
 function kynara_product_url( $post ) {
 	return kynara_page_url( 'products' ) . '#' . $post->post_name;
@@ -263,16 +290,27 @@ function kynara_seed_products() {
 	if ( $existing ) {
 		return;
 	}
-	// Use lines: the first four carried over from the products they replaced
-	// (Bark, Heartwood, Edge) - to be confirmed. The last three have none yet.
+	// Grove and Lattice lead: they're the flagship products. Use lines: Grove, Ridge,
+	// Ledge and Sapling carried theirs over from the products they replaced (Bark,
+	// Heartwood, Edge) - to be confirmed. Lattice, Cedar and Aspen have none yet.
 	$starters = array(
 		array( 'Grove',   'grove',   'Cladding' ),
+		array( 'Lattice', 'lattice', '' ),
 		array( 'Ridge',   'ridge',   'Cladding | Wall Panels | Ceiling' ),
 		array( 'Ledge',   'ledge',   'Posts | Beams' ),
 		array( 'Sapling', 'sapling', 'Close corners' ),
 		array( 'Cedar',   'cedar',   '' ),
 		array( 'Aspen',   'aspen',   '' ),
-		array( 'Lattice', 'lattice', '' ),
+	);
+	// KYNARA's colour range, on every product to start with. The swatches are
+	// approximations: match them to the real samples in the admin.
+	$colours = array(
+		array( 'Natural Teak', '#a8703f' ),
+		array( 'Royal Walnut', '#5a3824' ),
+		array( 'Warm Cherry', '#8e4630' ),
+		array( 'Weather Oak', '#9c8c77' ),
+		array( 'Ebony', '#2e2521' ),
+		array( 'Graphite', '#55575a' ),
 	);
 	foreach ( $starters as $i => $s ) {
 		$id = wp_insert_post( array(
@@ -282,6 +320,18 @@ function kynara_seed_products() {
 			'post_name'   => $s[1],
 			'menu_order'  => $i + 1,
 		) );
+		if ( $id && ! is_wp_error( $id ) ) {
+			// The colour range, as Secure Custom Fields stores a repeater: a row count, then
+			// kynara_colours_<row>_<sub field>, each with its field-key reference.
+			update_post_meta( $id, 'kynara_colours', count( $colours ) );
+			update_post_meta( $id, '_kynara_colours', 'field_kynara_colours' );
+			foreach ( $colours as $row => $c ) {
+				update_post_meta( $id, "kynara_colours_{$row}_name", $c[0] );
+				update_post_meta( $id, "_kynara_colours_{$row}_name", 'field_kynara_c_name' );
+				update_post_meta( $id, "kynara_colours_{$row}_colour", $c[1] );
+				update_post_meta( $id, "_kynara_colours_{$row}_colour", 'field_kynara_c_colour' );
+			}
+		}
 		if ( $id && ! is_wp_error( $id ) && '' !== $s[2] ) {
 			// Value plus the field-key reference, which is what update_field() writes
 			// for a text field - so get_field() finds it with or without the plugin.

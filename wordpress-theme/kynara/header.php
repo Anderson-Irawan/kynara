@@ -30,9 +30,9 @@ $kynara_keys    = array(
 			</a>
 			<nav class="main-nav" aria-label="Main">
 				<ul>
-					<li><a href="<?php echo esc_url( kynara_page_url( 'products' ) ); ?>"<?php echo kynara_aria_current( 'products' ); ?> data-i18n="nav.products">Products</a></li>
-					<li><a href="<?php echo esc_url( kynara_page_url( 'brand' ) ); ?>"<?php echo kynara_aria_current( 'brand' ); ?> data-i18n="nav.brand">The Brand</a></li>
-					<li><a href="<?php echo esc_url( kynara_page_url( 'contact' ) ); ?>"<?php echo kynara_aria_current( 'contact' ); ?> data-i18n="nav.contact">Contact</a></li>
+					<li><a href="<?php echo esc_url( kynara_page_url( 'products' ) ); ?>"<?php echo kynara_aria_current( 'products' ); ?>><span data-i18n="nav.products">Products</span></a></li>
+					<li><a href="<?php echo esc_url( kynara_page_url( 'brand' ) ); ?>"<?php echo kynara_aria_current( 'brand' ); ?>><span data-i18n="nav.brand">The Brand</span></a></li>
+					<li><a href="<?php echo esc_url( kynara_page_url( 'contact' ) ); ?>"<?php echo kynara_aria_current( 'contact' ); ?>><span data-i18n="nav.contact">Contact</span></a></li>
 				</ul>
 			</nav>
 			<div class="header-tools">
@@ -47,13 +47,12 @@ $kynara_keys    = array(
 						<span class="lang-switch__current">EN</span>
 					</button>
 					<ul class="lang-switch__menu" id="lang-menu">
-						<li><button type="button" data-set-lang="en" aria-pressed="true">English</button></li>
-						<li><button type="button" data-set-lang="id" aria-pressed="false">Bahasa Indonesia</button></li>
+						<li><button type="button" data-set-lang="en" aria-pressed="true"><span>English</span></button></li>
+						<li><button type="button" data-set-lang="id" aria-pressed="false"><span>Bahasa Indonesia</span></button></li>
 					</ul>
 				</div>
-				<button type="button" class="search-toggle" aria-expanded="false" aria-controls="search-panel">
+				<button type="button" class="search-toggle" aria-expanded="false" aria-controls="search-panel" data-i18n-aria="search.label" aria-label="Search the site">
 					<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.2 16.2 21 21"/></svg>
-					<span data-i18n="nav.search">SEARCH</span>
 				</button>
 				<button type="button" class="menu-toggle" aria-expanded="false" data-i18n="nav.menu">MENU</button>
 			</div>

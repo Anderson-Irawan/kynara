@@ -21,7 +21,7 @@ window.KYNARA_CONFIG = {
      to post the form, including the attached file, directly. */
   contact: {
     endpoint: '',
-    email: 'enquiries@kynara.co.id'
+    email: 'enquiries@kynara.id'
   },
 
   /* Newsletter form. Same idea as above: set an endpoint (e.g. Mailchimp / Brevo embed URL). */

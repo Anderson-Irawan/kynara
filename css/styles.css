@@ -311,58 +311,86 @@ html.lenis, html.lenis body { height: auto; }
 }
 .lang-switch__menu button + button { border-top: 1px solid var(--ink); }
 .lang-switch__menu button[aria-pressed="true"] { font-weight: 700; }
-/* Magnifier + label, laid out like the globe toggle. SEARCH becomes the shorter
-   "CARI" in Indonesian; the fixed min-width (55px widest label + 15px icon + 6px gap)
-   stops the globe to its left from sliding when the language changes, and
-   flex-start keeps the icon itself in place too. The label is its own <span>
-   because applyLang() sets textContent, which would wipe an icon on the button. */
-.search-toggle {
-  display: inline-flex; align-items: center; justify-content: flex-start; gap: 6px;
-  min-width: 76px; line-height: 1;
-}
+/* Search is the magnifier alone - Anderson removed the SEARCH label. Its name for
+   screen readers is the aria-label ("Search the site", key search.label). With no
+   label there's nothing to change width between languages, so the old min-width
+   that stopped the globe sliding is gone too. */
+.search-toggle { display: inline-flex; align-items: center; justify-content: center; line-height: 1; }
 .search-toggle svg { width: 15px; height: 15px; display: block; flex: none; }
+/* The globe and SEARCH answer hover with a filled rectangle rather than an underline
+   (Anderson's call). The fill is a ::before drawn slightly larger than the button, so
+   the header never moves; isolation keeps it behind the button's own text and icon.
+   It inverts the colours: green fill and cream text on the cream bar, cream fill and
+   green text over the Home hero. The globe stays filled while its menu is open. */
+.search-toggle,
+.lang-switch__toggle {
+  position: relative; isolation: isolate;
+  transition: color var(--hover-ms) var(--ui-enter);
+}
+.search-toggle::before,
+.lang-switch__toggle::before {
+  content: ""; position: absolute; inset: -9px -10px; z-index: -1;
+  background-color: var(--green); opacity: 0;
+  transition: opacity var(--hover-ms) var(--ui-enter), background-color var(--hover-ms) var(--ui-enter);
+}
+.search-toggle:hover,
+.lang-switch__toggle:hover,
+.lang-switch__toggle[aria-expanded="true"] { color: var(--cream); }
+.search-toggle:hover::before,
+.lang-switch__toggle:hover::before,
+.lang-switch__toggle[aria-expanded="true"]::before { opacity: 1; }
+/* over the hero (Home, top of the page, search closed): cream fill, green text */
+.site-header--overlay:not(.is-search-open):not(.is-scrolled) .search-toggle::before,
+.site-header--overlay:not(.is-search-open):not(.is-scrolled) .lang-switch__toggle::before { background-color: var(--cream); }
+.site-header--overlay:not(.is-search-open):not(.is-scrolled) .search-toggle:hover,
+.site-header--overlay:not(.is-search-open):not(.is-scrolled) .lang-switch__toggle:hover,
+.site-header--overlay:not(.is-search-open):not(.is-scrolled) .lang-switch__toggle[aria-expanded="true"] { color: var(--green); }
 .menu-toggle { display: none; }
 
 /* Hover (style rule 1). Every interactive thing answers the pointer with the same
    unhurried, eased change - --hover-ms on the --ui-enter curve - so the page moves
-   with one rhythm. Colour and underline only: never a lift, a scale or a shadow.
+   with one rhythm. Colour, underline and fill only: never a lift, a scale or a shadow.
 
-   Underlines fade in and rise into place. They are always present but transparent
-   and sitting low; hover brings the colour up and draws the line in to 3px.
-   (A drawn-on background-image underline was avoided: it measures the box, not the
-   text, and the nav links are fixed-width 170px boxes.) The decoration propagates
-   through the icon buttons to their text only, so icons are never underlined. */
-.main-nav a,
-.search-toggle,
+   Underlines draw across: in from the left on hover, away to the right on leave
+   (Anderson asked for this over the earlier fade-and-rise). The line is a 1px
+   BORDER on ::after, scaled 0 -> 1 along x. Its transform-origin flips from right to
+   left on hover without transitioning, which is what makes it grow from the left and
+   then leave to the right.
+   Why a border and not a 1px background-image: browsers snap borders to whole device
+   pixels, so the line is the same crisp hairline everywhere. A background line lands
+   wherever the text box ends - often between pixels, especially with Windows display
+   scaling - and gets smeared across two, looking thicker and greyer. Anderson liked
+   the thin one he saw in the full-height nav and asked for it everywhere.
+   The line spans its element, so it must sit on something as wide as the words: the
+   nav links (fixed 170px boxes) and the language options (full-width buttons) wrap
+   their text in a <span>, and the nav's data-i18n lives on that span. In the footer
+   bottom row only the text links get it - not the logo, which is also a link there. */
+.main-nav a > span,
 .menu-toggle,
-.lang-switch__toggle,
-.lang-switch__menu button,
-.btn-bracket,
-.subscribe__field button,
+.lang-switch__menu button > span,
 .footer-cols a,
-.footer-bottom a,
-.collection__all {
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-decoration-color: transparent;
-  text-underline-offset: 7px;
-  transition:
-    text-decoration-color var(--hover-ms) var(--ui-enter),
-    text-underline-offset var(--hover-ms) var(--ui-enter);
+.footer-bottom nav a,
+.collection__all { position: relative; }   /* the subscribe button is already absolute */
+.main-nav a > span::after,
+.menu-toggle::after,
+.lang-switch__menu button > span::after,
+.subscribe__field button::after,
+.footer-cols a::after,
+.footer-bottom nav a::after,
+.collection__all::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+  border-top: 1px solid currentColor;
+  transform: scaleX(0); transform-origin: right center;
+  transition: transform var(--hover-ms) var(--ui-enter);
+  pointer-events: none;
 }
-.main-nav a:hover,
-.search-toggle:hover,
-.menu-toggle:hover,
-.lang-switch__toggle:hover,
-.lang-switch__menu button:hover,
-.btn-bracket:hover,
-.subscribe__field button:hover,
-.footer-cols a:hover,
-.footer-bottom a:hover,
-.collection__all:hover {
-  text-decoration-color: currentColor;
-  text-underline-offset: 3px;
-}
+.main-nav a:hover > span::after,
+.menu-toggle:hover::after,
+.lang-switch__menu button:hover > span::after,
+.subscribe__field button:hover::after,
+.footer-cols a:hover::after,
+.footer-bottom nav a:hover::after,
+.collection__all:hover::after { transform: scaleX(1); transform-origin: left center; }
 
 /* The logo changes colour: brand green wherever it sits dark on cream/white, rust over
    the hero photo, where green would disappear into the dark-green gradient. (Rust there
@@ -550,9 +578,13 @@ html.lenis, html.lenis body { height: auto; }
   .search-panel, .search-panel.is-open,
   .site-header--overlay .site-header__bar,
   .site-header__bar::after,
-  .main-nav a, .search-toggle, .menu-toggle, .lang-switch__toggle, .lang-switch__menu button,
-  .btn-bracket, .subscribe__field button, .footer-cols a, .footer-bottom a,
-  .product-tile__arrow, .collection__all, .story__arrow, .story__card, .brand-logo::before, .circle-btn, .chat-fab, .chat-fab__label,
+  .main-nav a, .main-nav a > span, .search-toggle, .menu-toggle, .lang-switch__toggle, .lang-switch__menu button,
+  .lang-switch__menu button > span,
+  .main-nav a > span::after, .menu-toggle::after, .lang-switch__menu button > span::after,
+  .subscribe__field button::after, .footer-cols a::after, .footer-bottom nav a::after, .collection__all::after,
+  .search-toggle::before, .lang-switch__toggle::before,
+  .btn, .subscribe__field button, .footer-cols a, .footer-bottom a,
+  .pick__row, .product-tile__arrow, .collection__all, .story__arrow, .story__card, .brand-logo::before, .circle-btn, .socials a, .chat-fab, .chat-fab__label,
   .site-header__bar, .brand-logo, .site-header .brand-logo::after,
   .site-header--overlay.is-search-closing .site-header__bar,
   .site-header.is-search-closing .site-header__bar::after { transition: none; }
@@ -695,12 +727,51 @@ html.lenis, html.lenis body { height: auto; }
   border-radius: 46px;
 }
 .product-card .img-box { aspect-ratio: 292 / 374; }
+.product-card > .img-box { align-self: center; }   /* the photo sits vertically centred in the card */
 .product-card__name { font-family: var(--font-display); font-weight: 700; font-size: var(--t1); line-height: .9; margin-top: 18px; }
 .product-card__use { font-family: var(--font-display); font-size: var(--t4); line-height: 1.2; margin-top: 12px; }
-.product-card__specs { display: grid; grid-template-columns: 294px 1fr; margin-top: 48px; }
-.product-card__specs h3 { font-family: var(--font-body); font-weight: 500; font-size: var(--t5); }
-.swatches { display: grid; grid-template-columns: repeat(6, 42px); gap: 16px 16px; margin-top: 28px; }
-.swatch { width: 42px; height: 42px; border-radius: 50%; background: var(--swatch); }
+/* Key facts | Colour | Finishing (after vestre.com's product pages, 30 Sep): flat, square rows with
+   1px ink rules. Colour and Finishing are each a radio group of rows; the chosen row fills green with a
+   tick (main.js section 15). Finishing sits beside the colours; everything stacks on narrow screens. */
+.product-card__specs { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 32px; margin-top: 36px; align-items: start; }
+.pick { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: 32px; align-items: start; }
+.pick__title {                    /* small uppercase group label, like Vestre's */
+  font-family: var(--font-body); font-weight: 500; font-size: var(--t6); line-height: 1;
+  text-transform: uppercase; letter-spacing: .04em; margin-bottom: 12px;
+}
+.pick__list { border: 1px solid var(--ink); }
+.pick__list li + li { border-top: 1px solid var(--ink); }
+.pick__row {
+  display: grid; grid-template-columns: 28px 1fr 16px; align-items: center; gap: 14px;
+  width: 100%; min-height: 46px; padding: 8px 14px; text-align: left;
+  font-size: var(--t5); line-height: 1.2;
+  transition: background-color var(--hover-ms) var(--ui-enter), color var(--hover-ms) var(--ui-enter);
+}
+.pick__row--plain { grid-template-columns: 1fr 16px; }   /* Finishing: no swatch */
+.pick__swatch { width: 28px; height: 28px; border: 1px solid var(--ink); }
+.pick__row:hover .pick__name { color: var(--green); }
+.pick__row.is-selected { background: var(--green); color: var(--cream); }
+.pick__row.is-selected:hover .pick__name { color: var(--cream); }
+.pick__row.is-selected .pick__swatch { border-color: var(--cream); }
+.pick__check { width: 12px; height: 7px; border-left: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg) translate(1px, -2px); opacity: 0; }
+.pick__row.is-selected .pick__check { opacity: 1; }
+.pick__row:focus-visible { outline: 1px solid var(--ink); outline-offset: -4px; }
+.pick__row.is-selected:focus-visible { outline-color: var(--cream); }
+/* "Read more about the materials +": once, above the product list */
+.pick__more { margin: 0 0 42px; background: var(--swatch); font-size: var(--t6); }
+.pick__more summary { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; cursor: pointer; list-style: none; }
+.pick__more summary::-webkit-details-marker { display: none; }
+.pick__plus { position: relative; width: 12px; height: 12px; }
+.pick__plus::before, .pick__plus::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid currentColor; }
+.pick__plus::after { transform: rotate(90deg); }
+.pick__more[open] .pick__plus::after { display: none; }
+.pick__more p { padding: 0 14px; line-height: 1.45; }
+.pick__more a { display: inline-block; margin: 10px 14px 14px; text-decoration: underline; text-underline-offset: 3px; }
+/* Key facts: label left, value right, a rule under each, like the Home carousel cards */
+.facts__list { border-top: 1px solid var(--ink); }
+.facts__list > div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--ink); font-size: var(--t6); line-height: 1.3; }
+.facts__list dt { margin: 0; }
+.facts__list dd { margin: 0; text-align: right; }
 
 /* ==========================================================================
    The Brand page
@@ -735,6 +806,9 @@ html.lenis, html.lenis body { height: auto; }
 .stat__value { font-family: var(--font-display); font-size: var(--t3); line-height: 1; font-variant-numeric: tabular-nums; }
 .stat__label { font-size: var(--t6); line-height: 1.2; margin-top: 12px; }
 .feature--last { margin-bottom: 0; padding-bottom: 60px; }
+/* The layer breakdown (css/layers.css) sits between Sustainability and Applications,
+   spaced like a feature */
+.brand-body > .layers { margin-bottom: 55px; }
 
 /* ==========================================================================
    Contact page
@@ -763,9 +837,21 @@ html.lenis, html.lenis body { height: auto; }
 /* Stacked, not side by side: a status message appearing beside the button would push
    it off the centre line. */
 .form-actions { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 28px; text-align: center; }
-.btn-bracket { font-size: var(--t5); line-height: 1; padding: 14px 0; }
-.btn-bracket::before { content: "[ "; }
-.btn-bracket::after { content: " ]"; }
+/* A real, solid button (Send Enquiry) - it used to be a bracketed text link,
+   "[ Send Enquiry ]", and Anderson wanted it to read as a button. Square corners
+   like the form fields; hover inverts, like the circle buttons. The focus ring is
+   ink because the default currentColor ring would be cream on the cream page. */
+.btn {
+  display: inline-block; font-size: var(--t5); line-height: 1;
+  padding: 18px 44px;
+  background-color: var(--green); color: var(--cream); border: 1px solid var(--green);
+  transition:
+    background-color var(--hover-ms) var(--ui-enter),
+    color var(--hover-ms) var(--ui-enter);
+}
+.btn:hover { background-color: var(--cream); color: var(--green); }
+.btn:focus-visible { outline-color: var(--ink); }
+.btn:disabled { cursor: default; }
 .form-status { font-size: var(--t6); }
 .form-status.is-error { color: var(--rust); }
 
@@ -793,8 +879,14 @@ html.lenis, html.lenis body { height: auto; }
 .footer-cols { display: grid; grid-template-columns: 1fr 1fr 3.9fr;   /* Product, About, Contact - Projects was removed */ padding-top: 48px; }
 .footer-cols h3 { font-family: var(--font-body); font-weight: 700; font-size: var(--t5); line-height: 1.2; margin-bottom: 36px; }
 .footer-cols li { font-size: var(--t5); line-height: 26px; }
-.socials { display: flex; gap: 23px; margin-top: 16px; }
-.socials a { display: block; width: 24px; height: 24px; background: var(--swatch); }
+/* Social + email icons (the icons are atapku.com's): bare 24px line icons, no box -
+   Anderson removed the frame. Each link keeps a 36px tap area through padding, and the
+   row is pulled left by the same 6px so the first icon lines up with the column.
+   Hover turns the icon green, like the logo. */
+.socials { display: flex; gap: 8px; margin: 12px 0 0 -6px; }
+.socials a { display: block; padding: 6px; color: var(--ink); transition: color var(--hover-ms) var(--ui-enter); }
+.socials svg { width: 24px; height: 24px; display: block; }
+.socials a:hover { color: var(--green); }
 
 .footer-bottom { display: flex; align-items: center; gap: 58px; margin-top: 136px; }
 .footer-bottom .brand-logo { --logo-w: 200px; }
@@ -861,7 +953,7 @@ html.lenis, html.lenis body { height: auto; }
   .main-nav a { width: 150px; padding: 0 14px; }   /* still clears the widest ID label */
   .feature { grid-template-columns: 1fr 1.3fr; }
   .feature--reverse { grid-template-columns: 1.1fr 1fr; }
-  .product-card__specs { grid-template-columns: 1fr 1fr; }
+  .product-card__specs { grid-template-columns: 1fr; gap: 32px; }
 }
 
 @media (max-width: 900px) {
@@ -903,8 +995,6 @@ html.lenis, html.lenis body { height: auto; }
   .product-card .img-box { aspect-ratio: 4 / 3; }
   .product-card__name { margin-top: 0; overflow-wrap: anywhere; }
   .product-card__specs { grid-template-columns: 1fr; gap: 24px; margin-top: 28px; }
-  .swatches { grid-template-columns: repeat(6, 36px); gap: 12px; }
-  .swatch { width: 36px; height: 36px; }
 
   .feature, .feature--reverse { grid-template-columns: 1fr; gap: 28px; margin-bottom: 64px; }
   .feature--reverse .feature__text { padding-left: 0; order: -1; }
@@ -919,6 +1009,7 @@ html.lenis, html.lenis body { height: auto; }
 }
 
 @media (max-width: 520px) {
+  .pick { grid-template-columns: 1fr; gap: 24px; }   /* phones: Finishing drops under the colours */
   :root { --page-pad: 20px; }
   .two-col { grid-template-columns: 1fr; }
   .stats { grid-template-columns: repeat(2, 150px); gap: 16px; }

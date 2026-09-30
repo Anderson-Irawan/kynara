@@ -1,4 +1,4 @@
-# KYNARA website: handover notes for Claude (VS Code)
+# KYNARA website: handover notes for Codex (VS Code)
 
 Read this before changing anything. It tells you how the site is built and which style rules to keep.
 
@@ -234,47 +234,13 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   SUBSCRIBE stays a small text button with the drawn underline.
 
 ## Placeholders still to fill
-- **Product images are real (30 Sep):** Anderson's "hf" photos, `images/products/<slug> hf.png` (1792×2400, the
-  masters, ~6MB each — never load these), served as `images/products/<slug>.webp` (q80, 900px wide, 20–50KB), on the
-  Products page and the Home carousel (where the squarer frame crops them top and bottom, centred). They replaced a
-  first set of `<slug>.jpeg` photos the same day. **To swap a photo:** re-export the WebP to the same path; no HTML
-  changes. The old stand-ins `images/product 1/2` (one had another company's "MATTER HUB" label) are no longer used.
-  **WordPress:** set each product's featured image in the admin (the hf PNGs are the ones to upload).
-  The photos show that some carried-over use lines don't fit (Ledge "Posts | Beams" and Sapling "Close corners"
-  both look like board/cladding profiles) — confirm them with KYNARA.
-- **Product cards are Vestre-style (30 Sep, live)** — after vestre.com's product pages ("Choose materials").
-  Each card body: name + use line, then **Key facts | Colour | Finishing** (`.product-card__specs`: 1fr / 2fr, the 2fr
-  split 1.25 : .75 by `.pick`). Stacks under 1180px; on phones (≤520px) Finishing drops under Colour.
-  - **Key facts** (`.facts__list`): Use, Length, Width, Thickness — label left, value right, 1px rule under each.
-    The Use value carries the product's `product.<slug>.use` key so it translates with the use line.
-  - **Colour** and **Finishing** (`.pick__list`): flat square rows with 1px ink rules; each list is its own radio
-    group (main.js **section 15**: click to choose, arrow keys move, only the chosen row is tabbable). The chosen row
-    fills **green** with a tick. Colour rows have a 28px square swatch; Finishing rows (**Sanding**, **Wirebrush**) don't.
-    The heading is just "Colour" — no chosen name after it.
-  - **"Read more about the materials +"** appears **once, above the product list** (`.pick__more`), linking to the
-    About page's layer breakdown at `#our-product` (lands with the board exploded).
-  - Photo vertically centred in the card. **Removed at Anderson's request — don't add back:** a "Request a quote"
-    button on each card, a finish column on the colour rows (Brushed/Embossed/Matte), and the chosen colour's name
-    after the "Colour" heading. "Shorten the columns" meant narrower, not shorter rows.
-  - **The colour range is KYNARA's (Anderson, 30 Sep):** Natural Teak, Royal Walnut, Warm Cherry, Weather Oak, Ebony,
-    Graphite — the same six on every product, in that order. Names are product names, so they carry no `data-i18n`.
-    Key facts show "—" until measurements are supplied.
-  - **WordPress:** `page-products.php` builds the same card from the admin. Key facts = Use + the **Measurements**
-    repeater rows (or empty Length/Width/Thickness rows if none). Colour = the **Colour variants** repeater (the list
-    is hidden until at least one colour exists). `kynara_seed_products()` gives each starter product the six colours
-    (written as SCF repeater meta), so **only a fresh install gets them** — on an existing site, add them in the admin.
-    Finishing = a new
-    **Finishing** checkbox field (Sanding / Wirebrush; both ticked by default, and products never saved get both —
-    `kynara_product_finishing()`).
-  - Keys: `product.facts`, `product.options`, `product.colour`, `product.finishing`, `product.finish.sanding` /
-    `.wirebrush` (ID "Amplas" / "Sikat kawat"), `product.length` / `.width` / `.thickness`, `products.materials.more` /
-    `.body` / `.link` — ID wording is a first pass, review. `product.measurements` and `product.colors` were removed.
-- Product **measurements**: the Key facts rows show "—" (static) — fill Length/Width/Thickness per product, or the
-  Measurements repeater in the admin (WordPress).
-- **Colour swatches are approximations** of the names (Natural Teak `#a8703f`, Royal Walnut `#5a3824`, Warm Cherry
-  `#8e4630`, Weather Oak `#9c8c77`, Ebony `#2e2521`, Graphite `#55575a`). Match them to KYNARA's physical samples:
-  the `.pick__swatch` backgrounds in products.html, the seed list in `inc/products.php`, and the admin.
-  If a product doesn't come in every colour, remove its rows.
+- Product images (static preview): alternate between two sample photos, `images/product 1.webp` (odd products:
+  Grove, Ledge, Cedar, Lattice) and `product 2.webp` (even: Ridge, Sapling, Aspen), on the Products page and the Home
+  carousel. WebP q76, capped at 900px wide (cards never show wider than ~420px); the .jpeg originals are kept.
+  **These are stand-ins, not KYNARA product shots — `product 1` shows another company's "MATTER HUB" label.** Replace
+  each product's image separately before launch. The theme is unchanged: products there use their featured image.
+- Product **Measurements** are empty in the design. Put them under the Measurements `<h3>` in each `.product-card`.
+- **Colour swatches** are 12 grey circles per product. Set `style="background:#hex"` and `data-color="Name"` on each `.swatch`.
 - **Social links:** the footer has Instagram, Facebook and Email icons (see Done). **Instagram and Facebook still
   point to `#`** — put the real profile URLs in all four static footers and `footer.php`.
 - The phone numbers are the placeholder `+62 82 123 1234` from the design. The Terms of Use and Privacy links point to `#`.
@@ -455,11 +421,6 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   **An existing WordPress database is not changed** — `kynara_seed_products()` only seeds an empty site, by design, so
   the team's edits are never overwritten. A preview database made before this (`wordpress-theme/.preview-data/`) still
   has the old four: rename/add them in Products in the admin, or delete that folder to start fresh.
-  **Order since 30 Sep: Grove, Lattice, Ridge, Ledge, Sapling, Cedar, Aspen** — Lattice moved up under Grove because
-  **Grove and Lattice are the flagship products**; keep them first and second. Changed in the same places as above
-  (the carousel numbers were renumbered 01.–07.). WordPress orders products by **Order** (`menu_order`, in each
-  product's Page Attributes box): the seed now gives Lattice 2, but an existing site needs Lattice set between Grove
-  and Ridge by hand (e.g. Grove 1, Lattice 2, Ridge 3 … Aspen 7).
 - **Home story cards link to About chapters** (Anderson chose **two** groups for now). The whole card is the link:
   "Layers of Craftsmanship" (brown) → `brand.html#craftsmanship`, "Exploring Sustainable Forest Alternatives" (rust) →
   `brand.html#sustainability`; the circle button still goes to the top of About. The heading's `<a class="story__hit">`
@@ -609,10 +570,6 @@ are now plain `<span>`s, not buttons. The draft `.body` descriptions are still i
 - Under `prefers-reduced-motion`, or with `layers: { scrub: false }` in `KYNARA_CONFIG`, it doesn't pin. The
   board simply sits exploded. `layers: { gap: 118 }` sets the exploded spacing.
   `layers: { length: 900 }` sets the board length.
-- **Link to it with `#our-product`** (the id is on the `<section>`, in brand.html and page-brand.php). Landing there
-  puts the section top just under the header (`scroll-padding-top`), i.e. at scroll progress 0 with the board
-  **fully exploded**, so the visitor scrolls through the whole assembly. Don't link to `#layers-title`: the heading is
-  inside the pinned frame, so that anchor can land part-way into the scroll with the board already closed.
 - **No fade, whole board visible (29 Sep).** The board used to be 1500 long, run off the right edge to the screen
   edge, and fade out to the right and at the top (an SVG mask), as in the render. Anderson had the fade removed and
   the board shortened: he picked **Medium, length 900**, from a draft of 700 / 900 / 1100 (draft deleted). The art

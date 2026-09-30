@@ -1,0 +1,74 @@
+/* ==========================================================================
+   KYNARA layer breakdown ("exploded view"), js/layers.js
+   Load after css/styles.css: it only uses the tokens defined there.
+   Motion: scroll-scrubbed only (the board arrives exploded and closes up as you
+   scroll down through the pinned section, then holds). No layer is singled out: Anderson removed the
+   step-through, the selection, the dimming and the description panel.
+   Flat fills only, no shadows.
+   ========================================================================== */
+
+.layers { position: relative; background: var(--cream); }
+/* Scrubbing: the section is tall and its frame stays pinned while you scroll through it */
+.layers--scrub { height: 160vh; }   /* ~0.6 screen of pinned scroll (was 220vh: "too much scrolling") */
+.layers__frame {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  padding-top: 48px;
+  padding-bottom: 48px;
+}
+.layers--scrub .layers__frame {
+  position: sticky;
+  top: var(--header-h-small, 68px);
+  height: calc(100vh - var(--header-h-small, 68px));
+  height: calc(100svh - var(--header-h-small, 68px));
+}
+.layers__title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--t2);
+  line-height: 1.1;
+  letter-spacing: var(--tracking-display, -0.04em);
+}
+
+.layers__stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(200px, 24%) 1fr;
+  min-height: 0;
+  margin-top: 24px;
+}
+
+/* Labels: stacked in the left column, moved level with their layer by layers.js */
+.layers__labels { position: relative; list-style: none; margin: 0; padding: 0; }
+.layers__label {
+  position: absolute; left: 0;
+  display: block; text-align: left;
+  font-family: var(--font-body);
+  font-size: var(--t6);   /* labels are T6, name and sub alike (Anderson) */
+  line-height: 1.2;
+}
+.layers__label-text { display: inline-block; }
+.layers__label-name { display: block; font-weight: 700; color: var(--ink); }
+.layers__label-sub { display: block; color: var(--rust); }
+.layers__label-sub:empty { display: none; }
+
+/* Leader lines (drawn in an SVG over the whole stage) */
+.layers__leaders { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.layers__leader { stroke: var(--green); stroke-width: 1.5; fill: var(--green); }
+
+/* The drawing: the whole board, inside the page margins, with no fade (Anderson removed the
+   fade to the right and at the top on 29 Sep, and the board was shortened to fit). */
+.layers__art { position: relative; min-height: 0; }
+.layers__svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+/* Phones and small tablets: drawing on top, the labels in a 2 x 2 grid under it */
+@media (max-width: 900px) {
+  .layers--scrub { height: 150vh; }
+  .layers__frame { grid-template-rows: auto auto auto; align-content: start; padding-top: 28px; padding-bottom: 28px; }
+  .layers__stage { display: contents; }
+  .layers__title { order: 0; }
+  .layers__art { order: 1; height: 40svh; margin: 16px 0 8px; }
+  .layers__leaders { display: none; }
+  .layers__labels { order: 2; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 16px; }
+  .layers__label { position: static; padding: 10px 0; border-top: 1px solid var(--ink); }
+}

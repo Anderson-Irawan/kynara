@@ -31,7 +31,7 @@ get_header();
 					<input type="file" name="attachment" accept=".pdf,.jpg,.jpeg,.png,.dwg,.doc,.docx,.xls,.xlsx,.zip">
 				</label>
 				<div class="form-actions">
-					<button type="submit" class="btn-bracket" data-i18n="contact.submit">Send Enquiry</button>
+					<button type="submit" class="btn" data-i18n="contact.submit">Send Enquiry</button>
 					<p class="form-status" aria-live="polite"></p>
 				</div>
 			</form>

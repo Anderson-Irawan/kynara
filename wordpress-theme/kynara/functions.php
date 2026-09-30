@@ -74,7 +74,16 @@ add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_script( 'kynara-config', kynara_asset( 'js/config.js' ), array(), kynara_asset_ver( 'js/config.js' ), true );
 	wp_enqueue_script( 'kynara-i18n', kynara_asset( 'js/i18n.js' ), array(), kynara_asset_ver( 'js/i18n.js' ), true );
 	wp_enqueue_script( 'lenis', kynara_asset( 'js/vendor/lenis.min.js' ), array(), '1.3.26', true );
-	wp_enqueue_script( 'kynara-main', kynara_asset( 'js/main.js' ), array( 'kynara-config', 'kynara-i18n', 'lenis' ), kynara_asset_ver( 'js/main.js' ), true );
+	$kynara_main_deps = array( 'kynara-config', 'kynara-i18n', 'lenis' );
+
+	// The About page's layer breakdown. layers.js adds its strings to the dictionary, so it
+	// loads after i18n.js and before main.js (which applies the language).
+	if ( 'brand' === kynara_current_page() ) {
+		wp_enqueue_style( 'kynara-layers', kynara_asset( 'css/layers.css' ), array( 'kynara' ), kynara_asset_ver( 'css/layers.css' ) );
+		wp_enqueue_script( 'kynara-layers', kynara_asset( 'js/layers.js' ), array( 'kynara-config', 'kynara-i18n' ), kynara_asset_ver( 'js/layers.js' ), true );
+		$kynara_main_deps[] = 'kynara-layers';
+	}
+	wp_enqueue_script( 'kynara-main', kynara_asset( 'js/main.js' ), $kynara_main_deps, kynara_asset_ver( 'js/main.js' ), true );
 
 	// The search panel's index, built from the live products and pages.
 	wp_add_inline_script( 'kynara-main', 'window.KYNARA_SEARCH = ' . wp_json_encode( kynara_search_index() ) . ';', 'before' );
