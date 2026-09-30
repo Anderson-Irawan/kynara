@@ -17,6 +17,7 @@ get_header();
 			<div class="product-list">
 				<?php foreach ( kynara_get_products() as $kynara_p ) :
 					$kynara_use      = kynara_product_use( $kynara_p->ID );
+					$kynara_size     = kynara_product_size( $kynara_p->ID );
 					$kynara_measures = kynara_product_measurements( $kynara_p->ID );
 					$kynara_colours  = kynara_product_colours( $kynara_p->ID );
 					$kynara_finishes = kynara_product_finishing( $kynara_p->ID );
@@ -34,16 +35,12 @@ get_header();
 									<h3 class="pick__title" data-i18n="product.facts">Key facts</h3>
 									<dl class="facts__list">
 										<div><dt data-i18n="product.card.use">Use</dt><dd><?php echo $kynara_use ? esc_html( $kynara_use ) : '&mdash;'; ?></dd></div>
-										<?php if ( $kynara_measures ) : ?>
-											<?php foreach ( $kynara_measures as $kynara_m ) : ?>
-												<div><dt><?php echo esc_html( $kynara_m['label'] ); ?></dt><dd><?php echo esc_html( $kynara_m['value'] ); ?></dd></div>
-											<?php endforeach; ?>
-										<?php else : ?>
-											<?php // No measurements entered yet: the rows the design expects, empty. ?>
-											<div><dt data-i18n="product.length">Length</dt><dd>&mdash;</dd></div>
-											<div><dt data-i18n="product.width">Width</dt><dd>&mdash;</dd></div>
-											<div><dt data-i18n="product.thickness">Thickness</dt><dd>&mdash;</dd></div>
+										<?php if ( '' !== $kynara_size ) : ?>
+											<div><dt data-i18n="product.size">Size</dt><dd><?php echo esc_html( $kynara_size ); ?></dd></div>
 										<?php endif; ?>
+										<?php foreach ( $kynara_measures as $kynara_m ) : ?>
+											<div><dt><?php echo esc_html( $kynara_m['label'] ); ?></dt><dd><?php echo esc_html( $kynara_m['value'] ); ?></dd></div>
+										<?php endforeach; ?>
 									</dl>
 								</section>
 								<?php if ( $kynara_colours || $kynara_finishes ) : ?>

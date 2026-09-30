@@ -235,12 +235,12 @@
 
   var SEARCH_INDEX = [
     { href: 'products.html#grove', title: 'GROVE', key: 'product.grove.use' },
-    { href: 'products.html#lattice', title: 'LATTICE' },
+    { href: 'products.html#lattice', title: 'LATTICE', key: 'product.lattice.use' },
     { href: 'products.html#ridge', title: 'RIDGE', key: 'product.ridge.use' },
     { href: 'products.html#ledge', title: 'LEDGE', key: 'product.ledge.use' },
     { href: 'products.html#sapling', title: 'SAPLING', key: 'product.sapling.use' },
-    { href: 'products.html#cedar', title: 'CEDAR' },
-    { href: 'products.html#aspen', title: 'ASPEN' },
+    { href: 'products.html#cedar', title: 'CEDAR', key: 'product.cedar.use' },
+    { href: 'products.html#aspen', title: 'ASPEN', key: 'product.aspen.use' },
     { href: 'products.html', key: 'nav.products' },
     { href: 'brand.html', key: 'nav.brand' },
     { href: 'brand.html#craftsmanship', key: 'footer.craft' },

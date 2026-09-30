@@ -80,7 +80,15 @@ add_action( 'acf/include_fields', function () {
 				'name'         => 'kynara_use',
 				'label'        => 'Use',
 				'type'         => 'text',
-				'instructions' => 'The line under the product name, e.g. "Cladding | Wall Panels | Ceiling".',
+				'instructions' => 'The line under the product name, e.g. "Cladding | Sledding | Wallpanel | Plafond".',
+			),
+			array(
+				'key'           => 'field_kynara_size',
+				'name'          => 'kynara_size',
+				'label'         => 'Size',
+				'type'          => 'text',
+				'default_value' => '3m',
+				'instructions'  => 'The Size row in Key facts, e.g. "3m". Empty hides the row.',
 			),
 			array(
 				'key'          => 'field_kynara_measurements',
@@ -89,7 +97,7 @@ add_action( 'acf/include_fields', function () {
 				'type'         => 'repeater',
 				'layout'       => 'table',
 				'button_label' => 'Add measurement',
-				'instructions' => 'One row per measurement, e.g. "Width" / "140 mm".',
+				'instructions' => 'Optional extra Key facts rows, shown under Size, e.g. "Width" / "140 mm".',
 				'sub_fields'   => array(
 					array( 'key' => 'field_kynara_m_label', 'name' => 'label', 'label' => 'Label', 'type' => 'text' ),
 					array( 'key' => 'field_kynara_m_value', 'name' => 'value', 'label' => 'Value', 'type' => 'text' ),
@@ -191,6 +199,11 @@ function kynara_product_use( $post_id ) {
 	return (string) kynara_field( 'kynara_use', $post_id );
 }
 
+/** The Size row in Key facts. A product never saved since the field was added gets the default, 3m. */
+function kynara_product_size( $post_id ) {
+	return metadata_exists( 'post', $post_id, 'kynara_size' ) ? (string) kynara_field( 'kynara_size', $post_id ) : '3m';
+}
+
 /** Rows of array( 'label' => ..., 'value' => ... ), empty ones dropped. */
 function kynara_product_measurements( $post_id ) {
 	$rows = kynara_field( 'kynara_measurements', $post_id );
@@ -290,17 +303,15 @@ function kynara_seed_products() {
 	if ( $existing ) {
 		return;
 	}
-	// Grove and Lattice lead: they're the flagship products. Use lines: Grove, Ridge,
-	// Ledge and Sapling carried theirs over from the products they replaced (Bark,
-	// Heartwood, Edge) - to be confirmed. Lattice, Cedar and Aspen have none yet.
+	// Grove and Lattice lead: they're the flagship products. Use lines from Anderson, 30 Sep.
 	$starters = array(
 		array( 'Grove',   'grove',   'Cladding' ),
-		array( 'Lattice', 'lattice', '' ),
-		array( 'Ridge',   'ridge',   'Cladding | Wall Panels | Ceiling' ),
-		array( 'Ledge',   'ledge',   'Posts | Beams' ),
-		array( 'Sapling', 'sapling', 'Close corners' ),
-		array( 'Cedar',   'cedar',   '' ),
-		array( 'Aspen',   'aspen',   '' ),
+		array( 'Lattice', 'lattice', 'Decking' ),
+		array( 'Ridge',   'ridge',   'Cladding | Sledding | Wallpanel | Plafond' ),
+		array( 'Ledge',   'ledge',   'Cladding | Sledding | Wallpanel | Plafond' ),
+		array( 'Sapling', 'sapling', 'Furniture' ),
+		array( 'Cedar',   'cedar',   'Furniture' ),
+		array( 'Aspen',   'aspen',   'Furniture' ),
 	);
 	// KYNARA's colour range, on every product to start with. The swatches are
 	// approximations: match them to the real samples in the admin.

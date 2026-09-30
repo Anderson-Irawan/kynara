@@ -240,12 +240,19 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   first set of `<slug>.jpeg` photos the same day. **To swap a photo:** re-export the WebP to the same path; no HTML
   changes. The old stand-ins `images/product 1/2` (one had another company's "MATTER HUB" label) are no longer used.
   **WordPress:** set each product's featured image in the admin (the hf PNGs are the ones to upload).
-  The photos show that some carried-over use lines don't fit (Ledge "Posts | Beams" and Sapling "Close corners"
-  both look like board/cladding profiles) — confirm them with KYNARA.
+- **Use lines are Anderson's (30 Sep)** — every product has one now: Grove **Cladding**; Lattice **Decking**; Ridge
+  and Ledge **Cladding | Sledding | Wallpanel | Plafond**; Sapling, Cedar and Aspen **Furniture**. They appear in the
+  use line under the name, the Key facts Use row, the Home carousel's Use row and search (keys `product.<slug>.use`).
+  ID: Pelapis Dinding / Lantai Dek / Pelapis Dinding | Sledding | Panel Dinding | Plafon / Furnitur — review.
+  **"Sledding" is kept exactly as given** (it isn't a usual building term; possibly "Siding" or "Decking") — confirm
+  with Anderson before launch. The theme's i18n copy used to say Grove = "Decking" / "Lantai Dek"; that was wrong and
+  is now in line with the static one. WordPress: the seed carries these, but an existing site keeps whatever its Use
+  fields say — update them in the admin.
 - **Product cards are Vestre-style (30 Sep, live)** — after vestre.com's product pages ("Choose materials").
   Each card body: name + use line, then **Key facts | Colour | Finishing** (`.product-card__specs`: 1fr / 2fr, the 2fr
   split 1.25 : .75 by `.pick`). Stacks under 1180px; on phones (≤520px) Finishing drops under Colour.
-  - **Key facts** (`.facts__list`): Use, Length, Width, Thickness — label left, value right, 1px rule under each.
+  - **Key facts** (`.facts__list`): **Use** and **Size** (3m on every product) — label left, value right, 1px rule
+    under each. Length, Width and Thickness were **removed at Anderson's request** (30 Sep) in favour of Size.
     The Use value carries the product's `product.<slug>.use` key so it translates with the use line.
   - **Colour** and **Finishing** (`.pick__list`): flat square rows with 1px ink rules; each list is its own radio
     group (main.js **section 15**: click to choose, arrow keys move, only the chosen row is tabbable). The chosen row
@@ -258,19 +265,19 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
     after the "Colour" heading. "Shorten the columns" meant narrower, not shorter rows.
   - **The colour range is KYNARA's (Anderson, 30 Sep):** Natural Teak, Royal Walnut, Warm Cherry, Weather Oak, Ebony,
     Graphite — the same six on every product, in that order. Names are product names, so they carry no `data-i18n`.
-    Key facts show "—" until measurements are supplied.
-  - **WordPress:** `page-products.php` builds the same card from the admin. Key facts = Use + the **Measurements**
-    repeater rows (or empty Length/Width/Thickness rows if none). Colour = the **Colour variants** repeater (the list
+  - **WordPress:** `page-products.php` builds the same card from the admin. Key facts = Use, then **Size** (a text field,
+    default "3m"; products never saved since it was added also show 3m — `kynara_product_size()`; empty hides the
+    row), then any **Measurements** repeater rows, now optional extras. Colour = the **Colour variants** repeater (the list
     is hidden until at least one colour exists). `kynara_seed_products()` gives each starter product the six colours
     (written as SCF repeater meta), so **only a fresh install gets them** — on an existing site, add them in the admin.
     Finishing = a new
     **Finishing** checkbox field (Sanding / Wirebrush; both ticked by default, and products never saved get both —
     `kynara_product_finishing()`).
   - Keys: `product.facts`, `product.options`, `product.colour`, `product.finishing`, `product.finish.sanding` /
-    `.wirebrush` (ID "Amplas" / "Sikat kawat"), `product.length` / `.width` / `.thickness`, `products.materials.more` /
-    `.body` / `.link` — ID wording is a first pass, review. `product.measurements` and `product.colors` were removed.
-- Product **measurements**: the Key facts rows show "—" (static) — fill Length/Width/Thickness per product, or the
-  Measurements repeater in the admin (WordPress).
+    `.wirebrush` (ID "Amplas" / "Sikat kawat"), `product.size` (Size / Ukuran), `products.materials.more` /
+    `.body` / `.link` — ID wording is a first pass, review. `product.measurements`, `product.colors` and `product.length` / `.width` / `.thickness` were removed.
+- Product **size**: every product shows Size 3m. If one differs, change its `<dd>` in products.html and its Size field
+  in the admin.
 - **Colour swatches are approximations** of the names (Natural Teak `#a8703f`, Royal Walnut `#5a3824`, Warm Cherry
   `#8e4630`, Weather Oak `#9c8c77`, Ebony `#2e2521`, Graphite `#55575a`). Match them to KYNARA's physical samples:
   the `.pick__swatch` backgrounds in products.html, the seed list in `inc/products.php`, and the admin.
@@ -446,10 +453,9 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   size and 42px gap, as asked. Phones (≤900px) go back to full width.
 - **Products renamed and extended to seven** (Anderson's list, in this order): **Grove, Ridge, Ledge, Sapling, Cedar,
   Aspen, Lattice**, slugs/anchors in lower case (`products.html#ridge`). The first four took over the old four slots —
-  Floor/Grove → Grove, Bark → Ridge, Heartwood → Ledge, Edge → Sapling — and **kept those products' use lines, which
-  Anderson still needs to confirm**. Cedar, Aspen and Lattice have **no use line yet**: the static cards carry a comment
-  where it goes, the theme hides the line when the field is empty, and their search entries have no `key` (main.js no
-  longer prints "undefined" for that case). Dictionary keys follow the slugs (`product.ridge.use`…). Updated: static
+  Floor/Grove → Grove, Bark → Ridge, Heartwood → Ledge, Edge → Sapling — and kept those products' use lines until
+  Anderson supplied real ones for all seven (see "Use lines are Anderson's"). The theme still hides the line when the
+  field is empty, and a search entry with no `key` is still handled (main.js doesn't print "undefined"). Dictionary keys follow the slugs (`product.ridge.use`…). Updated: static
   Products cards (names typed in capitals, as the static CSS doesn't uppercase), Home carousel, all four footers, the
   static search index, both dictionaries, the Products meta/og description, and the theme's starter list + README.
   **An existing WordPress database is not changed** — `kynara_seed_products()` only seeds an empty site, by design, so
