@@ -286,8 +286,9 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
     group (main.js **section 15**: click to choose, arrow keys move, only the chosen row is tabbable). The chosen row
     fills **green** with a tick. Colour rows have a 28px square swatch; Finishing rows (**Sanding**, **Wirebrush**) don't.
     The heading is just "Colour" — no chosen name after it.
-  - **"Read more about the materials +"** appears **once, above the product list** (`.pick__more`), linking to the
-    About page's layer breakdown at `#our-product` (lands with the board exploded).
+  - **"Read more about the materials"** appears **once, above the product list** (`.pick__more`), linking to the
+    About page's layer breakdown at `#our-product` (lands with the board exploded). **Always open (1 Oct,
+    Anderson)**: a plain `<div>` with a `.pick__more-title`, no longer a collapsible `<details>` with a "+".
   - Photo vertically centred in the card. **Removed at Anderson's request — don't add back:** a "Request a quote"
     button on each card, a finish column on the colour rows (Brushed/Embossed/Matte), and the chosen colour's name
     after the "Colour" heading. "Shorten the columns" meant narrower, not shorter rows.

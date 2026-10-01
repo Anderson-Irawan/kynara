@@ -9,11 +9,11 @@ get_header();
 		<div class="wrap">
 			<h1 class="visually-hidden">Products</h1>
 			<!-- One materials note for the whole range (every product shares the same four-layer build), not one per card -->
-			<details class="pick__more">
-				<summary><span data-i18n="products.materials.more">Read more about the materials</span> <span class="pick__plus" aria-hidden="true"></span></summary>
+			<div class="pick__more">
+				<p class="pick__more-title" data-i18n="products.materials.more">Read more about the materials</p>
 				<p data-i18n="products.materials.body">Every KYNARA board is four layers: a PU clear coating, Nanowood pigment, a teak-grain composite face and a mineral composite core.</p>
 				<a href="<?php echo esc_url( kynara_page_url( 'brand' ) . '#our-product' ); ?>" data-i18n="products.materials.link">See how it's built</a>
-			</details>
+			</div>
 			<div class="product-list">
 				<?php foreach ( kynara_get_products() as $kynara_p ) :
 					$kynara_use      = kynara_product_use( $kynara_p->ID );

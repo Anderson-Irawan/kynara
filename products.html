@@ -86,11 +86,11 @@
       <h1 class="visually-hidden">Products</h1>
       <!-- One materials note for the whole range (every product shares the same four-layer build), not one per card.
            Each card: Key facts | Colour | Finishing (after vestre.com's product pages). The six colours are SAMPLES. -->
-      <details class="pick__more pick__more--page">
-        <summary><span data-i18n="products.materials.more">Read more about the materials</span> <span class="pick__plus" aria-hidden="true"></span></summary>
+      <div class="pick__more pick__more--page">   <!-- always open (1 Oct): it used to be a collapsible <details> -->
+        <p class="pick__more-title" data-i18n="products.materials.more">Read more about the materials</p>
         <p data-i18n="products.materials.body">Every KYNARA board is four layers: a PU clear coating, Nanowood pigment, a teak-grain composite face and a mineral composite core.</p>
         <a href="brand.html#our-product" data-i18n="products.materials.link">See how it's built</a>
-      </details>
+      </div>
       <div class="product-list">
         <article class="product-card" id="grove">
           <div class="img-box"><img src="images/products/grove.webp" alt="KYNARA Grove" loading="lazy"></div>

@@ -767,13 +767,9 @@ li.pick__row--plain { grid-template-columns: 1fr; }
 .pick__row.is-selected:focus-visible { outline-color: var(--cream); }
 /* "Read more about the materials +": once, above the product list */
 .pick__more { margin: 0 0 42px; background: var(--swatch); font-size: var(--t6); }
-.pick__more summary { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; cursor: pointer; list-style: none; }
-.pick__more summary::-webkit-details-marker { display: none; }
-.pick__plus { position: relative; width: 12px; height: 12px; }
-.pick__plus::before, .pick__plus::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid currentColor; }
-.pick__plus::after { transform: rotate(90deg); }
-.pick__more[open] .pick__plus::after { display: none; }
-.pick__more p { padding: 0 14px; line-height: 1.45; }
+/* Always open (1 Oct, Anderson): a plain block, no longer a collapsible <details> with a +. */
+.pick__more .pick__more-title { padding-top: 12px; font-weight: 500; }
+.pick__more p { padding: 8px 14px 0; line-height: 1.45; }
 .pick__more a { display: inline-block; margin: 10px 14px 14px; text-decoration: underline; text-underline-offset: 3px; }
 /* Key facts: label left, value right, a rule under each, like the Home carousel cards */
 .facts__list { border-top: 1px solid var(--ink); }
