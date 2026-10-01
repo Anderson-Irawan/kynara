@@ -59,6 +59,14 @@ add_action( 'init', function () {
 	) );
 } );
 
+/**
+ * The Colour + Finishing lists on the Products page: shown as a plain list (not selectable) since
+ * 1 Oct 2026. Set to false to hide them; the admin fields below stay either way.
+ */
+if ( ! defined( 'KYNARA_PRODUCT_OPTIONS' ) ) {
+	define( 'KYNARA_PRODUCT_OPTIONS', true );
+}
+
 /* Custom fields, registered in code (Secure Custom Fields / ACF API). */
 add_action( 'acf/include_fields', function () {
 	if ( ! function_exists( 'acf_add_local_field_group' ) ) {
@@ -80,7 +88,7 @@ add_action( 'acf/include_fields', function () {
 				'name'         => 'kynara_use',
 				'label'        => 'Use',
 				'type'         => 'text',
-				'instructions' => 'The line under the product name, e.g. "Cladding | Sledding | Wallpanel | Plafond".',
+				'instructions' => 'The line under the product name, e.g. "Cladding | Siding | Wallpanel | Plafond".',
 			),
 			array(
 				'key'           => 'field_kynara_size',
@@ -307,8 +315,8 @@ function kynara_seed_products() {
 	$starters = array(
 		array( 'Grove',   'grove',   'Cladding' ),
 		array( 'Lattice', 'lattice', 'Decking' ),
-		array( 'Ridge',   'ridge',   'Cladding | Sledding | Wallpanel | Plafond' ),
-		array( 'Ledge',   'ledge',   'Cladding | Sledding | Wallpanel | Plafond' ),
+		array( 'Ridge',   'ridge',   'Cladding | Siding | Wallpanel | Plafond' ),
+		array( 'Ledge',   'ledge',   'Cladding | Siding | Wallpanel | Plafond' ),
 		array( 'Sapling', 'sapling', 'Furniture' ),
 		array( 'Cedar',   'cedar',   'Furniture' ),
 		array( 'Aspen',   'aspen',   'Furniture' ),

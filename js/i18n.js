@@ -3,16 +3,15 @@
    - Every translatable element in the HTML has data-i18n="key" (text),
      data-i18n-html="key" (text containing <em>/<br>), data-i18n-placeholder="key",
      or data-i18n-aria="key" (aria-label).
-   - The English text is ALSO written directly in the HTML so pages read fine
-     without JavaScript and for search engines. Keep both in sync.
+   - ENGLISH LIVES IN THE HTML. To change English text, edit the page (or the WordPress template)
+     only: main.js shows each element's own English from the HTML. The 'en' entries below are a
+     fallback for text JS creates (form messages, search, the language switch) and for empty
+     elements - editing an 'en' entry does NOT change text that is written in a page.
+   - To change Indonesian, edit the 'id' entry here (find it by the element's data-i18n key).
    - ID strings are a first pass: have a native speaker review before launch.
-   - Lorem ipsum = placeholder copy still to be written; it is left identical in both languages.
+   - Body copy (Oct 2026) is written from the KYNARA teaser / brand guidelines; claims must stay within it.
    ========================================================================== */
 (function () {
-  var LOREM_LONG = 'Lorem ipsum dolor sit amet consectetur adipiscing elit. Et eos magna laborum fuga voluptas expedita expedita. Est reprehenderit quis et est ad minim amet laboris dolorem illum. Ipsum ut occaecat facere tempor aliqua nulla reprehenderit id excepteur maxime autem nam. Blanditiis nulla non id occaecat cum quidem. Excepteur occaecat cupidatat qui aliqua dolorem repellendus velit.';
-  var LOREM_A = 'Lorem ipsum dolor sit amet consectetur adipiscing elit. Et similique quod eiusmod accusamus tempor do. Ut qui blanditiis dolorum aut dolores placeat do. Lorem sunt qui omnis illum enim dolor. Praesentium mollit adipiscing dolore similique ullamco laborum est in cupiditate.';
-  var LOREM_B = 'Imperdiet possimus esse molestias deleniti sit tempore cumque sunt. Velit adipiscing quis eiusmod possimus laboris mollit aute in est laborum id lorem. Sint ea soluta est et possimus id consectetur.';
-
   window.KYNARA_I18N = {
     en: {
       /* Meta */
@@ -25,6 +24,10 @@
       'meta.desc.products': 'Explore the KYNARA collection of sustainable wood-plastic composite: Grove, Lattice, Ridge, Ledge, Sapling, Cedar and Aspen, for floors, walls and structures.',
       'meta.desc.brand': 'KYNARA blends rice husk from local farms with post-consumer recycled plastic: a sustainable alternative to timber, built for limitless applications.',
       'meta.desc.contact': 'Enquire about KYNARA wood-plastic composite products. Tell us about your project and our team will be in touch.',
+      'meta.title.terms': 'Terms of Use | KYNARA',
+      'meta.desc.terms': 'The terms for using the KYNARA website: product information, enquiries and quotes, content, privacy and liability.',
+      'meta.title.notfound': 'Page not found | KYNARA',
+      'meta.desc.notfound': 'The page you were looking for could not be found.',
 
       /* Header */
       'nav.products': 'Products',
@@ -44,19 +47,19 @@
 
       /* Home */
       'home.collection': 'Explore Our Collection',
-      'home.seeAll': 'See all',
+      'home.viewAll': 'View all products',
       'home.next': 'Next product',
       'home.craft.title': 'Layers of Craftsmanship',
-      'home.craft.body': LOREM_LONG,
+      'home.craft.body': 'Every KYNARA panel is engineered with intention. A mineral composite core gives it strength; a wood composite face gives it warmth. Our own NanoWood™ finish then builds up around seven layers of pigment and coating, for a lifelike wood grain and texture, without any deforestation.',
       'home.forest.title': 'Exploring Sustainable<br>Forest Alternatives',
-      'home.forest.body': LOREM_LONG,
+      'home.forest.body': 'Born from rice fields and recycled oceans. KYNARA blends rice husk from local farmers with post-consumer plastics, such as shampoo bottles and bottle caps, into a material that looks and feels like wood. Zero deforestation, 100% recyclable, and made so people can live close to nature without destroying it.',
       'home.learn': 'Learn about<br>The Brand',
 
       /* Products */
       'product.grove.use': 'Cladding',
       'product.lattice.use': 'Decking',
-      'product.ridge.use': 'Cladding | Sledding | Wallpanel | Plafond',
-      'product.ledge.use': 'Cladding | Sledding | Wallpanel | Plafond',
+      'product.ridge.use': 'Cladding | Siding | Wallpanel | Plafond',
+      'product.ledge.use': 'Cladding | Siding | Wallpanel | Plafond',
       'product.sapling.use': 'Furniture',
       'product.cedar.use': 'Furniture',
       'product.aspen.use': 'Furniture',
@@ -75,18 +78,18 @@
       /* The Brand */
       'brand.intro.title': 'Sustainable composites for<br>floors, walls and structures',
       'brand.craft.title': 'Layers of<br>Craftsmanship',
-      'brand.craft.a': LOREM_A,
-      'brand.craft.b': LOREM_B,
+      'brand.craft.a': 'The KY in KYNARA comes from kayu, the Indonesian word for wood, and wood is where our craft begins. Each panel pairs a mineral composite core with a wood composite face, reinforced with recycled polymer: engineered with intention, so nothing is accidental.',
+      'brand.craft.b': 'The surface is finished with NanoWood™, our own coating method of around seven layers of pigments and coatings, for stronger protection and a grain and texture true to real wood.',
       'brand.sustain.title': 'The Sustainable<br>Alternatives',
       'brand.stat1': 'rice husk from local farms',
       'brand.stat2': 'recycled plastic post-consumer',
       'brand.stat3': 'plastic saved from production',
       'brand.stat4': 'deforestation for production of goods',
-      'brand.sustain.a': LOREM_A,
-      'brand.sustain.b': LOREM_B,
+      'brand.sustain.a': 'KYNARA is an eco-friendly hybrid material, sourced responsibly from farmers and recycling facilities. Rice husk from the harvests of Nusantara is blended with post-consumer plastics such as shampoo bottles and bottle caps, so what would be waste becomes something built to last.',
+      'brand.sustain.b': 'We use recycled wood in our products too, so making them never means cutting down a tree: zero deforestation. A circular material, with local farmers and recycling industries as the backbone of our ecosystem, and products that let people live close to nature without destroying it.',
       'brand.apps.title': 'Limitless<br>Applications',
-      'brand.apps.a': LOREM_A,
-      'brand.apps.b': LOREM_B,
+      'brand.apps.a': 'From cladding and wall panels to decking, ceilings and furniture, KYNARA is made for the way people live: weather-resistant, waterproof, fire resistant and termite-free, with high load resistance and low maintenance.',
+      'brand.apps.b': 'Every panel is ASTM tested, by third-party labs and in-house, from 5,000 hours of accelerated weathering to stain, impact and abrasion resistance. International standards and Nusantara identity, with neither sacrificed for the other.',
 
       /* Contact */
       'contact.title': 'Enquire Today',
@@ -101,6 +104,32 @@
       'contact.mailto': 'Your email app has opened with your enquiry. Please attach any files there before sending.',
       'contact.error': 'Please fill in the required fields.',
       'contact.fail': 'Something went wrong. Please email enquiries@kynara.id directly.',
+
+      /* Terms of Use + 404 */
+      'terms.title': 'Terms of Use',
+      'terms.lead': 'These terms explain how you may use the KYNARA website, and the information, images and forms on it.',
+      'terms.updated': 'Last updated: 1 October 2026',
+      'terms.s1.title': '1. Scope',
+      'terms.s1.body': 'These terms apply when you use kynara.id, including our product information, enquiry and quote requests, file uploads and newsletter sign-up.',
+      'terms.s2.title': '2. Enquiries and quotes',
+      'terms.s2.body': 'Information on this website is for guidance only. Any quote, purchase, delivery or warranty is governed by the written offer, order confirmation or sales terms agreed for that order.',
+      'terms.s3.title': '3. Content and permitted use',
+      'terms.s3.body': 'Text, photographs, drawings, product data and other materials on this website belong to KYNARA or our licensors. You may not copy, republish or sell them, except as needed to specify or work with KYNARA products.',
+      'terms.s4.title': '4. Acceptable use',
+      'terms.s4.body': 'Do not interfere with the website, attempt unauthorised access, upload harmful files through our forms, or use the website in a way that is unlawful, misleading or harmful to KYNARA or others.',
+      'terms.s5.title': '5. Accuracy and availability',
+      'terms.s5.body': 'We aim to keep information accurate, but product details, colours, finishes, sizes and availability may change, and colours on screen can differ from a real panel. Please confirm critical details with us, ideally against a physical sample, before ordering or installing.',
+      'terms.s6.title': '6. Privacy',
+      'terms.s6.body': 'When you send an enquiry or subscribe, we use the details you give us to reply to you and, if you subscribed, to send you news from KYNARA.',
+      'terms.s7.title': '7. Changes and liability',
+      'terms.s7.body': 'We may update the website and these terms from time to time. The website is provided as available, and KYNARA is not liable for indirect loss, lost profits, or losses caused by unavailable or inaccurate website content, except where the law does not allow such limits.',
+      'terms.s8.title': '8. Governing law and contact',
+      'terms.s8.body': 'These terms are governed by the laws of the Republic of Indonesia. For any questions, please write to us at <a href="mailto:enquiries@kynara.id">enquiries@kynara.id</a>.',
+      'notfound.label': 'Error 404',
+      'notfound.title': 'This path leads nowhere.',
+      'notfound.body': 'The page you\'re looking for has moved or never existed. Let\'s get you back on solid ground.',
+      'notfound.home': 'Back to home',
+      'notfound.products': 'Explore our products',
 
       /* Footer */
       'footer.subscribe': 'Subscribe for updates, product news and potential collaborations',
@@ -132,6 +161,10 @@
       'meta.desc.products': 'Jelajahi koleksi komposit kayu-plastik berkelanjutan KYNARA: Grove, Lattice, Ridge, Ledge, Sapling, Cedar, dan Aspen, untuk lantai, dinding, dan struktur.',
       'meta.desc.brand': 'KYNARA memadukan sekam padi dari petani lokal dengan plastik daur ulang pascakonsumen: alternatif kayu yang berkelanjutan untuk penerapan tanpa batas.',
       'meta.desc.contact': 'Ajukan pertanyaan tentang produk komposit kayu-plastik KYNARA. Ceritakan proyek Anda dan tim kami akan segera menghubungi Anda.',
+      'meta.title.terms': 'Ketentuan Penggunaan | KYNARA',
+      'meta.desc.terms': 'Ketentuan penggunaan situs web KYNARA: informasi produk, pertanyaan dan penawaran, konten, privasi, dan tanggung jawab.',
+      'meta.title.notfound': 'Halaman tidak ditemukan | KYNARA',
+      'meta.desc.notfound': 'Halaman yang Anda cari tidak dapat ditemukan.',
 
       'nav.products': 'Produk',
       'nav.brand': 'Tentang Merek',
@@ -148,18 +181,18 @@
       'hero.static': 'Crafted for Harmonious Living',
 
       'home.collection': 'Jelajahi Koleksi Kami',
-      'home.seeAll': 'Lihat semua',
+      'home.viewAll': 'Lihat semua produk',
       'home.next': 'Produk berikutnya',
       'home.craft.title': 'Lapisan Keahlian',
-      'home.craft.body': LOREM_LONG,
+      'home.craft.body': 'Setiap panel KYNARA direkayasa dengan penuh pertimbangan. Inti komposit mineral memberinya kekuatan; permukaan komposit kayu memberinya kehangatan. Lapisan NanoWood™ kami kemudian membangun sekitar tujuh lapis pigmen dan pelapis, menghadirkan serat dan tekstur kayu yang menyerupai aslinya, tanpa deforestasi sedikit pun.',
       'home.forest.title': 'Menjelajahi Alternatif<br>Hutan yang Berkelanjutan',
-      'home.forest.body': LOREM_LONG,
+      'home.forest.body': 'Lahir dari sawah dan lautan yang didaur ulang. KYNARA memadukan sekam padi dari petani lokal dengan plastik pascakonsumen, seperti botol sampo dan tutup botol, menjadi material yang terlihat dan terasa seperti kayu. Tanpa deforestasi, 100% dapat didaur ulang, dan dibuat agar manusia dapat hidup dekat dengan alam tanpa merusaknya.',
       'home.learn': 'Kenali<br>Merek Kami',
 
       'product.grove.use': 'Pelapis Dinding',
       'product.lattice.use': 'Lantai Dek',   /* review */
-      'product.ridge.use': 'Pelapis Dinding | Sledding | Panel Dinding | Plafon',   /* "Sledding" kept as given; review */
-      'product.ledge.use': 'Pelapis Dinding | Sledding | Panel Dinding | Plafon',
+      'product.ridge.use': 'Pelapis Dinding | Siding | Panel Dinding | Plafon',
+      'product.ledge.use': 'Pelapis Dinding | Siding | Panel Dinding | Plafon',
       'product.sapling.use': 'Furnitur',
       'product.cedar.use': 'Furnitur',
       'product.aspen.use': 'Furnitur',
@@ -177,18 +210,18 @@
 
       'brand.intro.title': 'Komposit berkelanjutan untuk<br>lantai, dinding, dan struktur',
       'brand.craft.title': 'Lapisan<br>Keahlian',
-      'brand.craft.a': LOREM_A,
-      'brand.craft.b': LOREM_B,
+      'brand.craft.a': 'KY dalam KYNARA berasal dari kata kayu, dan dari kayulah keahlian kami bermula. Setiap panel memadukan inti komposit mineral dengan permukaan komposit kayu, diperkuat polimer daur ulang: direkayasa dengan sengaja, sehingga tidak ada yang kebetulan.',
+      'brand.craft.b': 'Permukaannya diselesaikan dengan NanoWood™, metode pelapisan kami sendiri yang terdiri dari sekitar tujuh lapis pigmen dan pelapis, untuk perlindungan yang lebih kuat serta serat dan tekstur yang setia pada kayu asli.',
       'brand.sustain.title': 'Alternatif yang<br>Berkelanjutan',
       'brand.stat1': 'sekam padi dari petani lokal',
       'brand.stat2': 'plastik daur ulang pascakonsumen',
       'brand.stat3': 'plastik terselamatkan dari produksi',
       'brand.stat4': 'deforestasi untuk produksi barang',
-      'brand.sustain.a': LOREM_A,
-      'brand.sustain.b': LOREM_B,
+      'brand.sustain.a': 'KYNARA adalah material hibrida ramah lingkungan yang bersumber secara bertanggung jawab dari petani dan fasilitas daur ulang. Sekam padi dari hasil panen Nusantara dipadukan dengan plastik pascakonsumen seperti botol sampo dan tutup botol, sehingga yang semula limbah menjadi sesuatu yang dibuat untuk bertahan lama.',
+      'brand.sustain.b': 'Kami juga menggunakan kayu daur ulang dalam produk kami, sehingga pembuatannya tidak pernah menebang pohon: tanpa deforestasi. Material yang sirkular, dengan petani lokal dan industri daur ulang sebagai tulang punggung ekosistem kami, serta produk yang memungkinkan manusia hidup dekat dengan alam tanpa merusaknya.',
       'brand.apps.title': 'Penerapan<br>Tanpa Batas',
-      'brand.apps.a': LOREM_A,
-      'brand.apps.b': LOREM_B,
+      'brand.apps.a': 'Dari pelapis dinding dan panel dinding hingga lantai dek, plafon, dan furnitur, KYNARA dibuat untuk cara manusia hidup: tahan cuaca, tahan air, tahan api, dan bebas rayap, dengan ketahanan beban tinggi serta perawatan yang minim.',
+      'brand.apps.b': 'Setiap panel telah diuji sesuai standar ASTM, oleh laboratorium pihak ketiga maupun secara internal, mulai dari 5.000 jam uji pelapukan dipercepat hingga ketahanan noda, benturan, dan abrasi. Standar internasional dan identitas Nusantara, tanpa mengorbankan salah satunya.',
 
       'contact.title': 'Hubungi Kami',
       'contact.name': 'Nama*',
@@ -202,6 +235,31 @@
       'contact.mailto': 'Aplikasi email Anda telah terbuka berisi pertanyaan Anda. Silakan lampirkan berkas di sana sebelum mengirim.',
       'contact.error': 'Mohon lengkapi kolom yang wajib diisi.',
       'contact.fail': 'Terjadi kesalahan. Silakan kirim email langsung ke enquiries@kynara.id.',
+
+      'terms.title': 'Ketentuan Penggunaan',
+      'terms.lead': 'Ketentuan ini menjelaskan cara Anda dapat menggunakan situs web KYNARA, beserta informasi, gambar, dan formulir di dalamnya.',
+      'terms.updated': 'Terakhir diperbarui: 1 Oktober 2026',
+      'terms.s1.title': '1. Cakupan',
+      'terms.s1.body': 'Ketentuan ini berlaku saat Anda menggunakan kynara.id, termasuk informasi produk, permintaan pertanyaan dan penawaran, unggahan berkas, serta pendaftaran buletin kami.',
+      'terms.s2.title': '2. Pertanyaan dan penawaran',
+      'terms.s2.body': 'Informasi di situs web ini hanya sebagai panduan. Setiap penawaran, pembelian, pengiriman, atau garansi diatur oleh penawaran tertulis, konfirmasi pesanan, atau ketentuan penjualan yang disepakati untuk pesanan tersebut.',
+      'terms.s3.title': '3. Konten dan penggunaan yang diizinkan',
+      'terms.s3.body': 'Teks, foto, gambar teknis, data produk, dan materi lain di situs web ini adalah milik KYNARA atau pemberi lisensi kami. Anda tidak boleh menyalin, menerbitkan ulang, atau menjualnya, kecuali sejauh diperlukan untuk merencanakan atau menggunakan produk KYNARA.',
+      'terms.s4.title': '4. Penggunaan yang wajar',
+      'terms.s4.body': 'Jangan mengganggu situs web, mencoba mengakses tanpa izin, mengunggah berkas berbahaya melalui formulir kami, atau menggunakan situs web dengan cara yang melanggar hukum, menyesatkan, atau merugikan KYNARA maupun pihak lain.',
+      'terms.s5.title': '5. Ketepatan dan ketersediaan',
+      'terms.s5.body': 'Kami berupaya menjaga ketepatan informasi, namun detail produk, warna, finishing, ukuran, dan ketersediaan dapat berubah, dan warna di layar dapat berbeda dari panel aslinya. Mohon pastikan detail penting kepada kami, sebaiknya dengan sampel fisik, sebelum memesan atau memasang.',
+      'terms.s6.title': '6. Privasi',
+      'terms.s6.body': 'Saat Anda mengirim pertanyaan atau berlangganan, kami menggunakan data yang Anda berikan untuk membalas Anda dan, jika Anda berlangganan, untuk mengirimkan kabar dari KYNARA.',
+      'terms.s7.title': '7. Perubahan dan tanggung jawab',
+      'terms.s7.body': 'Kami dapat memperbarui situs web dan ketentuan ini dari waktu ke waktu. Situs web disediakan sebagaimana adanya, dan KYNARA tidak bertanggung jawab atas kerugian tidak langsung, kehilangan keuntungan, atau kerugian akibat konten situs web yang tidak tersedia atau tidak akurat, kecuali jika hukum tidak mengizinkan batasan tersebut.',
+      'terms.s8.title': '8. Hukum yang berlaku dan kontak',
+      'terms.s8.body': 'Ketentuan ini diatur oleh hukum Republik Indonesia. Untuk pertanyaan apa pun, silakan hubungi kami di <a href="mailto:enquiries@kynara.id">enquiries@kynara.id</a>.',
+      'notfound.label': 'Galat 404',
+      'notfound.title': 'Jalan ini tidak menuju ke mana pun.',
+      'notfound.body': 'Halaman yang Anda cari telah dipindahkan atau tidak pernah ada. Mari kembali ke jalur yang benar.',
+      'notfound.home': 'Kembali ke beranda',
+      'notfound.products': 'Jelajahi produk kami',
 
       'footer.subscribe': 'Berlangganan untuk kabar terbaru, berita produk, dan peluang kolaborasi',
       'footer.emailLabel': 'Email',

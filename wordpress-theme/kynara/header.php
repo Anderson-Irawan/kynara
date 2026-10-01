@@ -11,6 +11,8 @@ $kynara_keys    = array(
 	'products' => array( 'meta.title.products', 'meta.desc.products' ),
 	'brand'    => array( 'meta.title.brand', 'meta.desc.brand' ),
 	'contact'  => array( 'meta.title.contact', 'meta.desc.contact' ),
+	'terms'    => array( 'meta.title.terms', 'meta.desc.terms' ),
+	'notfound' => array( 'meta.title.notfound', 'meta.desc.notfound' ),
 );
 ?><!DOCTYPE html>
 <html <?php language_attributes(); ?>>

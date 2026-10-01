@@ -49,6 +49,31 @@
     return (DICT.en || {})[key];
   }
 
+  // The page's own English, read from the HTML the first time each element is translated
+  // (before anything overwrites it). English is shown from HERE, so the HTML is the one place
+  // to edit English text; the 'en' dictionary only covers text JS creates (form messages,
+  // search) and elements whose HTML is empty. Indonesian comes from the 'id' dictionary,
+  // falling back to the page's English for any key it lacks.
+  var ORIGINAL = typeof WeakMap === 'function' ? new WeakMap() : null;
+  var ORIGINAL_TITLE = document.title;
+  var descMeta = document.head.querySelector('meta[name="description"]');
+  var ORIGINAL_DESC = descMeta ? descMeta.getAttribute('content') : null;
+
+  function localized(el, key, kind, read) {
+    var own = null;
+    if (ORIGINAL) {
+      var o = ORIGINAL.get(el);
+      if (!o) { o = {}; ORIGINAL.set(el, o); }
+      if (!(kind in o)) o[kind] = read();
+      own = o[kind];
+    }
+    var hasOwn = own != null && own !== '';
+    if (currentLang === 'en' && hasOwn) return own;
+    var table = DICT[currentLang] || {};
+    if (Object.prototype.hasOwnProperty.call(table, key)) return table[key];
+    return hasOwn ? own : t(key);
+  }
+
   function setMeta(attr, name, value) {
     var el = document.head.querySelector('meta[' + attr + '="' + name + '"]');
     if (el) el.setAttribute('content', value);
@@ -59,31 +84,33 @@
     document.documentElement.lang = lang;
 
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
-      var v = t(el.getAttribute('data-i18n'));
+      var v = localized(el, el.getAttribute('data-i18n'), 'text', function () { return el.textContent.replace(/\s+/g, ' ').trim(); });
       if (v != null) el.textContent = v;
     });
     document.querySelectorAll('[data-i18n-html]').forEach(function (el) {
-      var v = t(el.getAttribute('data-i18n-html'));
+      var v = localized(el, el.getAttribute('data-i18n-html'), 'html', function () { return el.innerHTML.trim(); });
       if (v != null) el.innerHTML = v;
     });
     document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
-      var v = t(el.getAttribute('data-i18n-placeholder'));
+      var v = localized(el, el.getAttribute('data-i18n-placeholder'), 'placeholder', function () { return el.getAttribute('placeholder'); });
       if (v != null) el.setAttribute('placeholder', v);
     });
     document.querySelectorAll('[data-i18n-aria]').forEach(function (el) {
-      var v = t(el.getAttribute('data-i18n-aria'));
+      var v = localized(el, el.getAttribute('data-i18n-aria'), 'aria', function () { return el.getAttribute('aria-label'); });
       if (v != null) el.setAttribute('aria-label', v);
     });
-    // Title, description and the social tags follow the chosen language
+    // Title, description and the social tags follow the chosen language (English: the page's own)
     var titleKey = document.body.getAttribute('data-title-key');
-    if (titleKey && t(titleKey)) {
-      document.title = t(titleKey);
-      setMeta('property', 'og:title', t(titleKey));
+    var title = lang === 'en' ? ORIGINAL_TITLE : (titleKey && t(titleKey));
+    if (title) {
+      document.title = title;
+      setMeta('property', 'og:title', title);
     }
     var descKey = document.body.getAttribute('data-desc-key');
-    if (descKey && t(descKey)) {
-      setMeta('name', 'description', t(descKey));
-      setMeta('property', 'og:description', t(descKey));
+    var desc = lang === 'en' ? ORIGINAL_DESC : (descKey && t(descKey));
+    if (desc) {
+      setMeta('name', 'description', desc);
+      setMeta('property', 'og:description', desc);
     }
     setMeta('property', 'og:locale', lang === 'id' ? 'id_ID' : 'en_GB');
     setMeta('property', 'og:locale:alternate', lang === 'id' ? 'en_GB' : 'id_ID');
@@ -712,7 +739,7 @@
   // Each .pick__list is a radio group of rows (after vestre.com's material lists): clicking a
   // row selects it; arrow keys move through the group like native radios, and only the
   // chosen row is in the tab order.
-  document.querySelectorAll('.pick__list').forEach(function (list) {
+  document.querySelectorAll('.pick__list[role="radiogroup"]').forEach(function (list) {   // the plain lists shown now aren't
     var rows = Array.prototype.slice.call(list.querySelectorAll('.pick__row'));
     function choose(row, focus) {
       rows.forEach(function (r) {

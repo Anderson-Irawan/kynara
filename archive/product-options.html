@@ -1,0 +1,57 @@
+<!--
+  KYNARA - Products page "Colour" + "Finishing" lists: the SELECTABLE version (Vestre-style radio rows)
+  Hidden on 1 Oct 2026; later the same day the lists came back as a PLAIN list (shown, not selectable).
+  This is the selectable version, kept in case Anderson wants choosing back. To use it, replace each card's
+  plain <section class="pick"> with the block below.
+  NOT a page of the site: don't upload this folder.
+
+  To restore (static site):
+  1. In products.html, each .product-card has a comment
+     "Colour + Finishing lists hidden ..." inside .product-card__specs, right after the Key facts <section>.
+     Replace that comment with the block below (same block for every product; the first row of each list
+     is the pre-selected one).
+  2. Nothing else is needed: the styles (.pick*, in css/styles.css) and the click/arrow-key behaviour
+     (main.js section 15) were left in place.
+  WordPress: set KYNARA_PRODUCT_OPTIONS to true in inc/products.php. The admin's "Colour variants" and
+  "Finishing" fields were never removed, so whatever the team entered is still there.
+
+  Notes when it comes back: the swatch colours are approximations - match them to KYNARA's samples
+  (the teaser PDF has photos of all six). The teaser names the finishes "Natural Motive" and "Wirebrush",
+  and the colour "Weathered Oak"; the site used "Sanding" and "Weather Oak" - confirm with Anderson.
+-->
+              <section class="pick" data-i18n-aria="product.options" aria-label="Colour and finishing">
+                <div class="pick__group">
+                  <h3 class="pick__title" data-i18n="product.colour">Colour</h3>
+                  <ul class="pick__list" role="radiogroup" data-i18n-aria="product.colour" aria-label="Colour">
+                    <li><button type="button" class="pick__row is-selected" role="radio" aria-checked="true" data-value="Natural Teak">
+                      <span class="pick__swatch" style="background:#a8703f"></span><span class="pick__name">Natural Teak</span><span class="pick__check" aria-hidden="true"></span>
+                    </button></li>
+                    <li><button type="button" class="pick__row" role="radio" aria-checked="false" data-value="Royal Walnut">
+                      <span class="pick__swatch" style="background:#5a3824"></span><span class="pick__name">Royal Walnut</span><span class="pick__check" aria-hidden="true"></span>
+                    </button></li>
+                    <li><button type="button" class="pick__row" role="radio" aria-checked="false" data-value="Warm Cherry">
+                      <span class="pick__swatch" style="background:#8e4630"></span><span class="pick__name">Warm Cherry</span><span class="pick__check" aria-hidden="true"></span>
+                    </button></li>
+                    <li><button type="button" class="pick__row" role="radio" aria-checked="false" data-value="Weather Oak">
+                      <span class="pick__swatch" style="background:#9c8c77"></span><span class="pick__name">Weather Oak</span><span class="pick__check" aria-hidden="true"></span>
+                    </button></li>
+                    <li><button type="button" class="pick__row" role="radio" aria-checked="false" data-value="Ebony">
+                      <span class="pick__swatch" style="background:#2e2521"></span><span class="pick__name">Ebony</span><span class="pick__check" aria-hidden="true"></span>
+                    </button></li>
+                    <li><button type="button" class="pick__row" role="radio" aria-checked="false" data-value="Graphite">
+                      <span class="pick__swatch" style="background:#55575a"></span><span class="pick__name">Graphite</span><span class="pick__check" aria-hidden="true"></span>
+                    </button></li>
+                  </ul>
+                </div>
+                <div class="pick__group">
+                  <h3 class="pick__title" data-i18n="product.finishing">Finishing</h3>
+                  <ul class="pick__list" role="radiogroup" data-i18n-aria="product.finishing" aria-label="Finishing">
+                    <li><button type="button" class="pick__row pick__row--plain is-selected" role="radio" aria-checked="true" data-value="Sanding">
+                      <span class="pick__name" data-i18n="product.finish.sanding">Sanding</span><span class="pick__check" aria-hidden="true"></span>
+                    </button></li>
+                    <li><button type="button" class="pick__row pick__row--plain" role="radio" aria-checked="false" data-value="Wirebrush">
+                      <span class="pick__name" data-i18n="product.finish.wirebrush">Wirebrush</span><span class="pick__check" aria-hidden="true"></span>
+                    </button></li>
+                  </ul>
+                </div>
+              </section>

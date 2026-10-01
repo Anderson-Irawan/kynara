@@ -1,0 +1,2 @@
+# Missing pages show the KYNARA 404 page (404.html uses <base href="/"> so its links work from any address).
+ErrorDocument 404 /404.html

@@ -31,7 +31,7 @@ function kynara_asset_ver( $path ) {
 }
 
 /**
- * URL of one of the site's pages by slug ('products', 'brand', 'contact').
+ * URL of one of the site's pages by slug ('products', 'brand', 'contact', 'terms').
  * Falls back to /slug/ so links never break if a page is missing.
  */
 function kynara_page_url( $slug ) {
@@ -39,12 +39,15 @@ function kynara_page_url( $slug ) {
 	return $page ? get_permalink( $page ) : home_url( '/' . $slug . '/' );
 }
 
-/** Which of the site's pages is being viewed: home, products, brand, contact or ''. */
+/** Which of the site's pages is being viewed: home, products, brand, contact, terms, notfound or ''. */
 function kynara_current_page() {
 	if ( is_front_page() ) {
 		return 'home';
 	}
-	foreach ( array( 'products', 'brand', 'contact' ) as $slug ) {
+	if ( is_404() ) {
+		return 'notfound';
+	}
+	foreach ( array( 'products', 'brand', 'contact', 'terms' ) as $slug ) {
 		if ( is_page( $slug ) ) {
 			return $slug;
 		}
@@ -96,6 +99,8 @@ add_filter( 'pre_get_document_title', function ( $title ) {
 		'products' => 'Products | KYNARA',
 		'brand'    => 'The Brand | KYNARA',
 		'contact'  => 'Contact | KYNARA',
+		'terms'    => 'Terms of Use | KYNARA',
+		'notfound' => 'Page not found | KYNARA',
 	);
 	$page = kynara_current_page();
 	return isset( $titles[ $page ] ) ? $titles[ $page ] : $title;
@@ -108,6 +113,8 @@ function kynara_description() {
 		'products' => 'Explore the KYNARA collection of sustainable wood-plastic composite: decking, cladding and wall panels, posts and beams, and corner trims.',
 		'brand'    => 'KYNARA blends rice husk from local farms with post-consumer recycled plastic: a sustainable alternative to timber, built for limitless applications.',
 		'contact'  => 'Enquire about KYNARA wood-plastic composite products. Tell us about your project and our team will be in touch.',
+		'terms'    => 'The terms for using the KYNARA website: product information, enquiries and quotes, content, privacy and liability.',
+		'notfound' => 'The page you were looking for could not be found.',
 	);
 	$page = kynara_current_page();
 	return isset( $d[ $page ] ) ? $d[ $page ] : get_bloginfo( 'description' );
@@ -183,17 +190,9 @@ function kynara_first_run() {
 		'products' => 'Products',
 		'brand'    => 'The Brand',
 		'contact'  => 'Contact',
+		'terms'    => 'Terms of Use',
 	);
-	$ids = array();
-	foreach ( $pages as $slug => $title ) {
-		$existing = get_page_by_path( $slug );
-		$ids[ $slug ] = $existing ? $existing->ID : wp_insert_post( array(
-			'post_type'   => 'page',
-			'post_status' => 'publish',
-			'post_title'  => $title,
-			'post_name'   => $slug,
-		) );
-	}
+	$ids = kynara_ensure_pages( $pages );
 
 	// Home is the front page; pretty URLs (/products/ rather than ?page_id=2).
 	if ( ! empty( $ids['home'] ) && ! is_wp_error( $ids['home'] ) ) {
@@ -210,3 +209,29 @@ function kynara_first_run() {
 	update_option( 'kynara_setup_done', KYNARA_VERSION );
 	delete_option( 'kynara_setup_lock' );
 }
+
+/**
+ * Creates any of the site's pages that don't exist yet; returns slug => ID.
+ * Pages added after a site was first set up (Terms of Use, 1 Oct 2026) are created on the
+ * next page load too, once per list: kynara_pages_list remembers which list last ran.
+ */
+function kynara_ensure_pages( $pages ) {
+	$ids = array();
+	foreach ( $pages as $slug => $title ) {
+		$existing = get_page_by_path( $slug );
+		$ids[ $slug ] = $existing ? $existing->ID : wp_insert_post( array(
+			'post_type'   => 'page',
+			'post_status' => 'publish',
+			'post_title'  => $title,
+			'post_name'   => $slug,
+		) );
+	}
+	update_option( 'kynara_pages_list', implode( ',', array_keys( $pages ) ) );
+	return $ids;
+}
+add_action( 'init', function () {
+	$pages = array( 'terms' => 'Terms of Use' );
+	if ( get_option( 'kynara_setup_done' ) && false === strpos( (string) get_option( 'kynara_pages_list' ), 'terms' ) ) {
+		kynara_ensure_pages( array_merge( array( 'home' => 'Home', 'products' => 'Products', 'brand' => 'The Brand', 'contact' => 'Contact' ), $pages ) );
+	}
+}, 21 );

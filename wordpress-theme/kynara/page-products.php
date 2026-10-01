@@ -29,7 +29,7 @@ get_header();
 							<?php if ( $kynara_use ) : ?>
 								<p class="product-card__use"><?php echo esc_html( $kynara_use ); ?></p>
 							<?php endif; ?>
-							<?php // Key facts | Colour | Finishing (after vestre.com's product pages). ?>
+							<?php // Key facts | Colour | Finishing (after vestre.com's product pages). Colour + Finishing are a plain list (not selectable); KYNARA_PRODUCT_OPTIONS hides them. ?>
 							<div class="product-card__specs">
 								<section class="facts" data-i18n-aria="product.facts" aria-label="Key facts">
 									<h3 class="pick__title" data-i18n="product.facts">Key facts</h3>
@@ -43,16 +43,14 @@ get_header();
 										<?php endforeach; ?>
 									</dl>
 								</section>
-								<?php if ( $kynara_colours || $kynara_finishes ) : ?>
+								<?php if ( KYNARA_PRODUCT_OPTIONS && ( $kynara_colours || $kynara_finishes ) ) : ?>
 									<section class="pick" data-i18n-aria="product.options" aria-label="Colour and finishing">
 										<?php if ( $kynara_colours ) : ?>
 											<div class="pick__group">
 												<h3 class="pick__title" data-i18n="product.colour">Colour</h3>
-												<ul class="pick__list" role="radiogroup" data-i18n-aria="product.colour" aria-label="Colour">
-													<?php foreach ( $kynara_colours as $kynara_i => $kynara_c ) : ?>
-														<li><button type="button" class="pick__row<?php echo 0 === $kynara_i ? ' is-selected' : ''; ?>" role="radio" aria-checked="<?php echo 0 === $kynara_i ? 'true' : 'false'; ?>" data-value="<?php echo esc_attr( $kynara_c['name'] ); ?>">
-															<span class="pick__swatch" style="background:<?php echo esc_attr( $kynara_c['colour'] ); ?>"></span><span class="pick__name"><?php echo esc_html( $kynara_c['name'] ); ?></span><span class="pick__check" aria-hidden="true"></span>
-														</button></li>
+												<ul class="pick__list">
+													<?php foreach ( $kynara_colours as $kynara_c ) : ?>
+														<li class="pick__row"><span class="pick__swatch" style="background:<?php echo esc_attr( $kynara_c['colour'] ); ?>"></span><span class="pick__name"><?php echo esc_html( $kynara_c['name'] ); ?></span></li>
 													<?php endforeach; ?>
 												</ul>
 											</div>
@@ -60,11 +58,9 @@ get_header();
 										<?php if ( $kynara_finishes ) : ?>
 											<div class="pick__group">
 												<h3 class="pick__title" data-i18n="product.finishing">Finishing</h3>
-												<ul class="pick__list" role="radiogroup" data-i18n-aria="product.finishing" aria-label="Finishing">
-													<?php foreach ( $kynara_finishes as $kynara_i => $kynara_f ) : ?>
-														<li><button type="button" class="pick__row pick__row--plain<?php echo 0 === $kynara_i ? ' is-selected' : ''; ?>" role="radio" aria-checked="<?php echo 0 === $kynara_i ? 'true' : 'false'; ?>" data-value="<?php echo esc_attr( $kynara_f['key'] ); ?>">
-															<span class="pick__name" data-i18n="product.finish.<?php echo esc_attr( $kynara_f['key'] ); ?>"><?php echo esc_html( $kynara_f['label'] ); ?></span><span class="pick__check" aria-hidden="true"></span>
-														</button></li>
+												<ul class="pick__list">
+													<?php foreach ( $kynara_finishes as $kynara_f ) : ?>
+														<li class="pick__row pick__row--plain"><span class="pick__name" data-i18n="product.finish.<?php echo esc_attr( $kynara_f['key'] ); ?>"><?php echo esc_html( $kynara_f['label'] ); ?></span></li>
 													<?php endforeach; ?>
 												</ul>
 											</div>

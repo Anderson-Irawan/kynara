@@ -51,7 +51,9 @@ proportion and hierarchy rather than absolute pixel widths.
 
 ## Folder map
 ```
-index.html  products.html  brand.html  contact.html
+index.html  products.html  brand.html  contact.html  terms.html  404.html
+.htaccess             Apache: missing addresses show 404.html (the current host is Apache)
+archive/              kept-for-later snippets (product-options.html). NOT part of the site - don't upload.
 css/styles.css        all styles; tokens are at the top in :root
 js/config.js          EDITABLE SETTINGS: hero rolling words, form endpoints
 js/i18n.js            EN + ID translation dictionary
@@ -110,6 +112,8 @@ fonts/                Candara (display) + DM Sans (body), loaded with @font-face
      cream bar; cream fill + green over the Home hero). The logo and the footer icons change colour (green;
      the logo goes rust over the hero). The circle buttons invert to a cream fill with green text/icon.
      Colour, underline and fill only — still no lifts, scales or shadows.
+   - **the footer shapes drifting** — irregular outlines with softened corners (1px `--green`, no fill) sliding slowly sideways
+     behind every footer, after vestre.com's footer (`.footer-shapes`, see Done). Still under reduced motion.
    - **the contact button extending on hover** — the rounded square opens leftwards into a rounded rectangle reading
      "Request a quote or get in touch", the chat bubble travelling with the left edge (`.chat-fab`, see Done).
      A width change on the button itself, not a scale.
@@ -126,7 +130,7 @@ fonts/                Candara (display) + DM Sans (body), loaded with @font-face
    |---|---|---|
    | `--t1` | 72px | contact title, product names |
    | `--t2` | 48px | feature headings (The Brand) |
-   | `--t3` | 36px | section titles, story h2, subscribe heading, stat values, number + name on the Home carousel cards |
+   | `--t3` | 36px | section titles, story h2, subscribe heading, stat values, the name (and "View all products") on the Home carousel cards |
    | `--t4` | 24px | product use line |
    | `--t5` | 16px | body copy, footer links, form fields |
    | `--t6` | 14px | labels, captions, and the whole header bar |
@@ -168,7 +172,7 @@ fonts/                Candara (display) + DM Sans (body), loaded with @font-face
    which is why `.feature` and `.footer-cols` are fractional.
 
 ## Header and footer are duplicated
-The header and footer markup is copied into all four HTML files so the pages work with no JS and no build step.
+The header and footer markup is copied into all six HTML files (the four pages, terms.html and 404.html) so the pages work with no JS and no build step.
 **When you change one, change all four.** Only two things differ per page: the header modifier class and which
 nav link has `aria-current="page"`. The logo markup is now identical everywhere.
 
@@ -202,12 +206,22 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
 
 ## Language switch (EN / ID)
 - English is the default and is also written directly in the HTML, which keeps it readable for SEO and when JS is off.
+- **English lives in the HTML only (1 Oct).** main.js (`localized()` in applyLang) shows each element's own
+  English, read from the page the first time it's translated, so **editing English = editing the page** (or the
+  WordPress template). It used to fill English from the `en` dictionary too, which silently undid HTML edits —
+  Anderson hit that on the Terms page. The `en` entries now only cover text JS creates (form messages, search,
+  language switch) and elements whose HTML is empty; editing an `en` entry does NOT change text written in a page.
+  Indonesian still comes from the `id` dictionary (falling back to the page's English for a missing key).
+  Tested: EN → ID → EN on all pages, a page opened with `?lang=id` then switched to English, and with the `en`
+  entries deliberately changed (the page's English still wins).
 - Translatable elements carry one of these attributes:
   `data-i18n="key"` (plain text), `data-i18n-html="key"` (text with `<br>`/`<em>`),
   `data-i18n-placeholder="key"`, `data-i18n-aria="key"`. The page title comes from `<body data-title-key>`
   and the meta description from `<body data-desc-key>`. Switching language also updates `og:title`,
   `og:description` and `og:locale` (see `setMeta` in main.js), so the `meta.desc.*` keys must exist in both dictionaries.
-- All strings live in `js/i18n.js` under `en` and `id`. **When you add text, add the HTML English, the `data-i18n` key, and both dictionary entries.**
+- Strings live in `js/i18n.js` under `en` and `id`. **When you add text: write the English in the HTML, give the
+  element a `data-i18n` key, and add the `id` entry** (an `en` entry too, by convention — it keeps the two
+  dictionaries in parity — but it is only a fallback). **When you change English text, edit the HTML only.**
 - The chosen language is saved in localStorage (inside try/catch) and also carried on links as `?lang=id`.
 - Product names (GROVE, RIDGE, LEDGE, SAPLING, CEDAR, ASPEN, LATTICE) are brand names. Do not translate them. Neither is the hero
   headline — see the rolling-word section above.
@@ -219,7 +233,15 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
 
 ### Translating to Indonesian (next task)
 - The `id` dictionary already has a **first-pass translation** of every real string: nav, headings, product uses, stats, form labels and footer. Anderson reads Indonesian, so ask him to review the wording, especially "Hubungi Kami" for "Enquire Today". (The hero is no longer part of this — it stays English.)
-- Lorem ipsum is placeholder copy and is the same in both languages. When Anderson supplies real copy, add proper EN and ID versions.
+- **No lorem ipsum is left (1 Oct).** The eight body paragraphs (Home story cards `home.craft.body` / `home.forest.body`;
+  About `brand.craft.a/b`, `brand.sustain.a/b`, `brand.apps.a/b`) were written from Anderson's **KYNARA teaser / brand
+  guidelines PDF**, in EN and ID, in the static pages, the theme templates and both dictionaries. **Every claim comes
+  from that document** (mineral + wood composite layers, NanoWood™ ~7 layers, rice husk + post-consumer plastics,
+  zero deforestation, 100% recyclable, the advantages list, ASTM / third-party testing incl. 5,000h QUV/QSUN) — keep
+  new copy inside it; don't invent performance claims. The `LOREM_*` constants in i18n.js were removed.
+  One addition from Anderson himself (1 Oct): **KYNARA also uses recycled wood**, which is why production needs zero
+  deforestation — said in `brand.sustain.b`.
+  Not from the document and still unverified: the About stats (60% / 30% / ~600kg).
 - Register: formal but warm (use *Anda*, not *kamu*). Keep premium, concise phrasing. Keep the product names and "KYNARA" in capitals.
 - Where ID text runs longer, check the layout at 1280px and 390px. There is no longer an ID hero size override: the hero is English in both languages, so it cannot overflow its `white-space: nowrap`.
 
@@ -241,13 +263,19 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   changes. The old stand-ins `images/product 1/2` (one had another company's "MATTER HUB" label) are no longer used.
   **WordPress:** set each product's featured image in the admin (the hf PNGs are the ones to upload).
 - **Use lines are Anderson's (30 Sep)** — every product has one now: Grove **Cladding**; Lattice **Decking**; Ridge
-  and Ledge **Cladding | Sledding | Wallpanel | Plafond**; Sapling, Cedar and Aspen **Furniture**. They appear in the
+  and Ledge **Cladding | Siding | Wallpanel | Plafond**; Sapling, Cedar and Aspen **Furniture**. They appear in the
   use line under the name, the Key facts Use row, the Home carousel's Use row and search (keys `product.<slug>.use`).
-  ID: Pelapis Dinding / Lantai Dek / Pelapis Dinding | Sledding | Panel Dinding | Plafon / Furnitur — review.
-  **"Sledding" is kept exactly as given** (it isn't a usual building term; possibly "Siding" or "Decking") — confirm
-  with Anderson before launch. The theme's i18n copy used to say Grove = "Decking" / "Lantai Dek"; that was wrong and
+  ID: Pelapis Dinding / Lantai Dek / Pelapis Dinding | Siding | Panel Dinding | Plafon / Furnitur — review.
+  **"Sledding" was Anderson's typo for "Siding"** (corrected 1 Oct, EN and ID). The theme's i18n copy used to say Grove = "Decking" / "Lantai Dek"; that was wrong and
   is now in line with the static one. WordPress: the seed carries these, but an existing site keeps whatever its Use
   fields say — update them in the admin.
+- **Colour + Finishing are a PLAIN LIST (1 Oct)** — shown, **not selectable** (Anderson: "don't make them selectable").
+  Each row is an `<li class="pick__row">` (swatch + name; Finishing has no swatch): no buttons, no selected row,
+  no tick, no hover, not in the tab order. main.js section 15 now only wires lists with `role="radiogroup"`, so these
+  stay inert. (Earlier that day the lists were hidden altogether, then brought back like this.) The **selectable**
+  version is kept in `archive/product-options.html`; its CSS (button rows, `.is-selected`, the tick) is still in
+  styles.css. WordPress: `KYNARA_PRODUCT_OPTIONS` (now true) shows/hides them; page-products.php prints plain rows.
+  Where the description below talks about choosing, ticks and arrow keys, that is the archived selectable version.
 - **Product cards are Vestre-style (30 Sep, live)** — after vestre.com's product pages ("Choose materials").
   Each card body: name + use line, then **Key facts | Colour | Finishing** (`.product-card__specs`: 1fr / 2fr, the 2fr
   split 1.25 : .75 by `.pick`). Stacks under 1180px; on phones (≤520px) Finishing drops under Colour.
@@ -284,7 +312,16 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   If a product doesn't come in every colour, remove its rows.
 - **Social links:** the footer has Instagram, Facebook and Email icons (see Done). **Instagram and Facebook still
   point to `#`** — put the real profile URLs in all four static footers and `footer.php`.
-- The phone numbers are the placeholder `+62 82 123 1234` from the design. The Terms of Use and Privacy links point to `#`.
+- **WhatsApp numbers.** The two footer phone numbers open WhatsApp (1 Oct) — `https://wa.me/<number>`, new tab.
+  The real numbers since 1 Oct: **+62 852 3338 6088** (`wa.me/6285233386088`) and **+62 882 2325 2525**
+  (`wa.me/6288223252525`). Each number is written two ways: the **link** (country code + number, digits only —
+  no `+`, spaces or leading 0) and the **text** people see. To change one, edit both, in **all six static pages** (index,
+  products, brand, contact, terms, 404) **and** `wordpress-theme/kynara/footer.php`. In VS Code: Ctrl+Shift+H
+  (replace in files), replace the old link digits (e.g. `wa.me/6285233386088`) with the new ones, then the old
+  visible text with the new — the two numbers differ, so each can be replaced on its own. An Indonesian
+  mobile written locally as 0812-3456-7890 becomes link `wa.me/6281234567890` and text `+62 812 3456 7890`.
+  To pre-fill a message: `https://wa.me/6281234567890?text=Hello%20KYNARA`.
+- Terms of Use now goes to its own page (see Done); **Privacy still points to `#`** — a privacy policy page is still to be written.
 
 ## Decisions already made
 - The nav item is **"Products"** and opens `products.html`. The Product draft labels it "[ Projects ]"; Anderson asked for "Products" instead. If a separate Projects (portfolio) page arrives, create `projects.html` and add it as its own nav item — don't rename this one back.
@@ -301,6 +338,28 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   `og:url` are hardcoded in the static pages; if the domain ever changes again, search the project for it.
 - ~~The Brand hero image is too small~~ — resolved: The Brand no longer has a hero (see Done). The banner that
   replaced it is 1440px wide; on very large screens (container over ~1440px) it will soften slightly.
+
+### Done (October 2026)
+- **Footer shapes (after vestre.com's footer).** Behind every footer, a band of shapes drifts slowly left
+  (`.footer-shapes`, 140s per loop): **irregular polygons — notches, odd angles — with every corner rounded off (radius 28 in
+  tile units), as 1px `--green` strokes with no fill**. One 2400×800 SVG tile is drawn twice in `.footer-shapes__track`, which slides
+  by -50% (exactly one tile), so the loop never shows a seam; shapes must stay inside the tile. Each SVG is as tall
+  as the footer. Behind the content (`z-index`), `aria-hidden`, not clickable, still under reduced motion.
+  **Tried and rejected by Anderson:** pieces of the logomark (leaf-hands, dome); soft round forms ("too
+  circular"); sharp-cornered polygons ("too similar to Vestre"). The corners are rounded in the path data
+  itself (scratchpad `footershapes4.js` in the October session: each vertex becomes a curve starting R before it). Note for edits: a CSS rule does not reliably style paths inside a `<symbol>` drawn through `<use>`
+  (that first version came out filled black) — the shapes are now plain `<polygon>`s styled by CSS.
+- **Terms of Use page** — `terms.html` / `page-terms.php` (slug `terms`), after vestre.com/terms-of-use: T1 title,
+  T4 lead, "Last updated", then eight numbered sections (T4 Candara headings, T5 body, 640px column). Every footer's
+  "Terms of Use" link points to it. Copy and keys `terms.*`, `meta.*.terms` (EN + ID). **It's a sensible template,
+  not legal advice — have KYNARA's lawyer review it**, especially section 8 (Indonesian law was assumed) and 6 (privacy).
+  In WordPress the page is created automatically, also on sites set up before it existed (`kynara_ensure_pages()`,
+  remembered in the `kynara_pages_list` option).
+- **404 page** — `404.html` / `404.php`: "Error 404" label, T1 "This path leads nowhere.", a line of copy, a solid
+  `.btn` "Back to home" and an underlined "Explore our products" link, beside the forest-path photo
+  (`brand-banner.webp`); light header, footer, contact button. Keys `notfound.*`, `meta.*.notfound`. The static
+  page carries `<base href="/">` (it is served at any missing address, so relative links must resolve from the root
+  — it therefore doesn't work opened straight from disk) and `noindex`. `.htaccess` points Apache at it.
 
 ### Done (September 2026)
 - **Meta + social:** every page now has its own real `<meta name="description">`, plus Open Graph, `twitter:card` and `rel="canonical"`. The social card is `images/og-kynara.jpg` (1200x630: the placeholder building photo under the hero's green-to-rust scrim, with the light logotype).
@@ -408,16 +467,21 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   lives in `--card-w` on the track (422px; 78% on phones) because the spacer needs it. The old 200px bleed-past-the-edge margin and padding were dropped; the track
   now runs to the screen edge. The Next button still wraps back to the first card from the end.
 - **Home carousel items are spec-sheet cards** (`.product-tile`, after Anderson's "001. stack" reference), replacing the
-  bare photo + name. Each card, cream on the green section: a head row with the number ("01.", Candara regular) left and
-  the name (Candara bold) right, both T3, over a 1px ink rule; the photo edge to edge with a rule under it; a **Use** row
+  bare photo + name. Each card, cream on the green section: a head row with the name (Candara bold, T3, **in capitals**
+  via `text-transform`, 1 Oct — the HTML/admin keep "Grove") over a 1px ink rule. **The "01." numbers were removed at
+  Anderson's request (1 Oct)** — don't add them back; the photo edge to edge with a rule under it; a **Use** row
   (T6, label left, value right, rule under) only when the product has a use line; then the squared 45° arrow, bottom
   right. **The whole card is the link, with no underline**; hover nudges the arrow 3px the way it points. Cards stretch
   to the tallest (`.collection__item` is flex), so the arrows line up — a card with no Use row shows a blank band there
   until its use line is supplied. A Material row and a small KYNARA logo in the foot were tried and **removed at
   Anderson's request** — don't add them back. Rounded like the Products page cards (46px / 32px on phones, at Anderson's request), with
-  30px/34px padding in the head and foot to keep the text and arrow clear of the corners. The photo's `alt` is empty because the card already names the product. In the theme the number comes
-  from the loop index (`%02d.` — two digits; Anderson doesn't expect 100 products) and Use from the admin field; the whole Use list is skipped when it's empty. Key:
+  30px/34px padding in the head and foot to keep the text and arrow clear of the corners. The photo's `alt` is empty because the card already names the product. In the theme Use comes from the admin field; the whole Use list is skipped when it's empty. Key:
   `product.card.use` ("Use" / "Kegunaan" — review).
+  **The last card is "View all products"** (`.product-tile--all`, 1 Oct): the same card shell, so the same width and —
+  stretched like the others — the same height, holding only the words (`.product-tile__all`, Candara bold T3, in the
+  tracking group) and the arrow; it links to Products. It replaced the "See all" link beside the title. Being the last
+  card, it's where the carousel's end stop lands (slot 2 on desktop). Key `home.viewAll` ("View all products" /
+  "Lihat semua produk" — review). In the theme it follows the product loop in front-page.php.
 - **Floating contact button** (`.chat-fab`): a 64px **rounded square** (16px corners; 56px and closer in on phones)
   fixed bottom-right with a **filled** chat-bubble icon (`fill="currentColor"`, so it inverts with the button), linking to Contact, on **every page except Contact**. Solid `--green`
   with a cream icon and a 1px cream border — the border is what keeps it visible over the green Home section.
@@ -463,7 +527,7 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   has the old four: rename/add them in Products in the admin, or delete that folder to start fresh.
   **Order since 30 Sep: Grove, Lattice, Ridge, Ledge, Sapling, Cedar, Aspen** — Lattice moved up under Grove because
   **Grove and Lattice are the flagship products**; keep them first and second. Changed in the same places as above
-  (the carousel numbers were renumbered 01.–07.). WordPress orders products by **Order** (`menu_order`, in each
+(the carousel numbers were renumbered then; they've since been removed). WordPress orders products by **Order** (`menu_order`, in each
   product's Page Attributes box): the seed now gives Lattice 2, but an existing site needs Lattice set between Grove
   and Ridge by hand (e.g. Grove 1, Lattice 2, Ridge 3 … Aspen 7).
 - **Home story cards link to About chapters** (Anderson chose **two** groups for now). The whole card is the link:
@@ -504,10 +568,8 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   - The footer's About column already lists exactly these three anchors, so it needs no change.
   - Building it: copy the rust card's markup (it's a plain `<article>` with a stretched `.story__hit`), give it
     `story__card--cream`, add a third row to `.story`'s grid, and add EN + ID keys.
-- **"See all" beside "Explore Our Collection"** on Home: `.collection__head` puts the title and a `.collection__all`
-  link (DM Sans, `--t5`, the standard eased underline hover) on one line, right-aligned and baseline-aligned. It
-  goes to Products (`products.html`; `kynara_page_url('products')` in the theme). Key `home.seeAll` ("See all" /
-  "Lihat semua").
+- ~~"See all" beside "Explore Our Collection"~~ — **removed 1 Oct** at Anderson's request (link, `.collection__all` styles
+  and `home.seeAll`), replaced by the "View all products" card at the end of the carousel.
 - **The header carries its state across pages** (main.js section 8, both copies). On `pagehide`, if the bar is
   shrunk, a timestamp goes into `sessionStorage` (`kynara-header-carry`). The next page, *if it opens at the top*
   and the note is under 5s old, paints the bar shrunk with `.is-instant` (no transition), re-enables transitions
@@ -545,9 +607,14 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   shifts it up by the overflow; main.js translates it at 30% of scroll speed, which exactly consumes the slack
   so no edge is ever exposed. Guarded by `prefers-reduced-motion: no-preference` in CSS *and* a matchMedia
   check in JS, and it degrades to a still photo with JS off.
-- **Nav no longer reflows when the language changes.** `.main-nav a` has a fixed `width: 170px` (150px under
-  1180px), which clears the widest label in either language — "[ Tentang Merek ]", measured at 112.7px in
-  DM Sans at T6. (The search button used to need a `min-width` too, for SEARCH → "CARI"; it's icon-only now.)
+- **Nav sits beside the logo (1 Oct)**, no longer centred. The bar's grid is `var(--logo-w) auto 1fr` (48px gap; 36px
+  under 1180px): the first column is the **full** logo width, so when the header shrinks and the logo narrows to the
+  logomark inside it, **the nav doesn't move** (measured: the first link at the same x before and after, at 1280 and
+  1000px). `--logo-w` (195px) now lives on `:root` so the logo and the column share it; the footer and phone
+  overrides on `.brand-logo` still work. Phones (≤900px) keep their own grid with the MENU.
+- **Nav no longer reflows when the language changes.** `.main-nav a` has a fixed width — `140px` (130px under 1180px),
+  left-aligned text with the spacing on the right — which clears the widest label in either language — "[ Tentang
+  Merek ]", measured at 112.7px in DM Sans at T6. (It was 170/150px, centred, while the nav was centred.) (The search button used to need a `min-width` too, for SEARCH → "CARI"; it's icon-only now.)
   **If you change a nav label or T6, re-measure.**
 - **One eased hover language everywhere** (`--hover-ms` 280ms, `--ui-enter`). History: opacity fade → instant
   underline → underline fading in and rising 7px → 3px → **now (28 Sep) an underline that draws across**, from the
@@ -557,10 +624,10 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   especially at Windows 125%/150% scaling — and got smeared across two pixels, looking thicker than the crisp line
   Anderson happened to see in the full-height nav. He asked for that thin line everywhere; borders are snapped to
   whole device pixels, so it now is (checked at 1.25× scale). The line spans its element, so **it must sit on
-  something as wide as the words**: nav links (fixed 170px boxes) and language options (full-width buttons) wrap their
+  something as wide as the words**: nav links (fixed 140px boxes) and language options (full-width buttons) wrap their
   text in a `<span>`, and the nav's `data-i18n` lives on that span. Applies to: nav, MENU, language options, the
   subscribe button, footer column links, the Terms/Privacy links (`.footer-bottom nav a` — not the footer logo,
-  which is a link too), "See all".
+  which is a link too).
   **The globe and search** (28 Sep) use a fill instead: a `::before` rectangle 9px/10px larger than the button (so
   nothing moves; `isolation: isolate` keeps it behind the text/icon), fading in with the text colour inverting —
   green fill + cream text on the cream bar, cream fill + green text over the Home hero
