@@ -328,8 +328,9 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   `#8e4630`, Weather Oak `#9c8c77`, Ebony `#2e2521`, Graphite `#55575a`). Match them to KYNARA's physical samples:
   the `.pick__swatch` backgrounds in products.html, the seed list in `inc/products.php`, and the admin.
   If a product doesn't come in every colour, remove its rows.
-- **Social links:** the footer has Instagram, Facebook and Email icons (see Done). **Instagram and Facebook still
-  point to `#`** — put the real profile URLs in all four static footers and `footer.php`.
+- **Social links (5 Oct):** the footer has **Instagram → https://www.instagram.com/kynara.wpc/** (@kynara.wpc, new tab)
+  and Email. **Facebook was removed "for now"** at Anderson's request — to bring it back, copy the Instagram `<a>` in
+  the six static footers and `footer.php`, with the filled "f" icon (still in git history / atapku.com).
 - **WhatsApp numbers.** The two footer phone numbers open WhatsApp (1 Oct) — `https://wa.me/<number>`, new tab.
   The real numbers since 1 Oct: **+62 852 3338 6088** (`wa.me/6285233386088`) and **+62 882 2325 2525**
   (`wa.me/6288223252525`). Each number is written two ways: the **link** (country code + number, digits only —
@@ -358,6 +359,14 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   replaced it is 1440px wide; on very large screens (container over ~1440px) it will soften slightly.
 
 ### Done (October 2026)
+- **Clean URLs on the live site (5 Oct)**: kynara.id/products, /brand, /contact, /terms instead of `.html`.
+  **The source keeps its `.html` names and links** — that's what keeps Live Server and opening from disk working, so
+  keep writing `products.html` in links. Three parts: (1) `.htaccess` (Apache, mod_rewrite) serves `/products` from
+  `products.html` and 301-redirects any `.html` address (and `/index.html` → `/`) to the clean one; (2) main.js
+  `cleanPath()` strips `.html` from internal links and search results **only when the page is on a real host**
+  (not file://, localhost, 127.x or a LAN address), so clicks don't take a redirect hop; (3) canonical and `og:url`
+  use the clean addresses. A new page needs nothing extra. WordPress already has clean URLs; its copy of main.js
+  carries the same harmless code. **If the host isn't Apache**, the rewrite needs the host's equivalent.
 - **Search is a full-screen overlay (2 Oct)**, after cityofbristol.ac.uk ("make it better"). `.search-overlay` (still
   `id="search-panel"`, inside the header in all six pages + header.php): the page **blurs** (`backdrop-filter: blur(14px)`)
   behind a see-through `--green` (solid green where blur isn't supported); a large **Candara T2 field**, centred

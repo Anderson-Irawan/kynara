@@ -74,6 +74,17 @@
     return hasOwn ? own : t(key);
   }
 
+  // Clean addresses on the live site: .htaccess serves kynara.id/products from products.html,
+  // so links there drop ".html" (and index.html becomes "./"). The HTML keeps the .html links,
+  // because Live Server and pages opened from disk need them - so locally nothing changes.
+  var CLEAN_URLS = /^https?:$/.test(location.protocol) &&
+    !/^(localhost|127\.\d+\.\d+\.\d+|\[::1\]|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+)$/.test(location.hostname);
+  function cleanPath(path) {
+    if (!CLEAN_URLS) return path;
+    if (/(^|\/)index\.html$/.test(path)) return path.replace(/index\.html$/, '') || './';
+    return path.replace(/\.html$/, '');
+  }
+
   function setMeta(attr, name, value) {
     var el = document.head.querySelector('meta[' + attr + '="' + name + '"]');
     if (el) el.setAttribute('content', value);
@@ -133,7 +144,7 @@
       if (h > -1) { hash = href.slice(h); href = href.slice(0, h); }
       var path = href.split('?')[0];
       if (!/\.html$/.test(path)) return;
-      a.setAttribute('href', path + (lang === 'en' ? '' : '?lang=' + lang) + hash);
+      a.setAttribute('href', cleanPath(path) + (lang === 'en' ? '' : '?lang=' + lang) + hash);
     });
 
     buildRollers();
@@ -277,7 +288,7 @@
   function searchDetail(item) { return item.title ? (item.text || (item.key ? t(item.key) : '') || '') : ''; }
   function searchHref(item) {
     var parts = item.href.split('#');
-    return parts[0] + (currentLang === 'en' ? '' : '?lang=' + currentLang) + (parts[1] ? '#' + parts[1] : '');
+    return cleanPath(parts[0]) + (currentLang === 'en' ? '' : '?lang=' + currentLang) + (parts[1] ? '#' + parts[1] : '');
   }
   // The matched part of a label is wrapped in <mark> (underlined, not highlighted)
   function appendMarked(el, text, q) {

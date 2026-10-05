@@ -1,2 +1,22 @@
+# KYNARA - Apache settings for the live site (kynara.id). Upload this with the pages.
+
 # Missing pages show the KYNARA 404 page (404.html uses <base href="/"> so its links work from any address).
 ErrorDocument 404 /404.html
+
+# Clean addresses: kynara.id/products instead of kynara.id/products.html.
+# The files keep their .html names, so editing and previewing in VS Code are unchanged.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Old addresses (bookmarks, shared links, search results) move permanently to the clean ones.
+  # THE_REQUEST is what the visitor actually asked for, so these never loop with the rule below.
+  RewriteCond %{THE_REQUEST} \s/+(.*?/)?index\.html[\s?] [NC]
+  RewriteRule ^ /%1 [R=301,L]
+  RewriteCond %{THE_REQUEST} \s/+(.+?)\.html[\s?] [NC]
+  RewriteRule ^ /%1 [R=301,L]
+
+  # A clean address is served from the matching .html file.
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.+?)/?$ /$1.html [L]
+</IfModule>
