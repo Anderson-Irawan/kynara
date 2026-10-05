@@ -66,17 +66,17 @@
         <button type="button" class="menu-toggle" aria-expanded="false" data-i18n="nav.menu">MENU</button>
       </div>
     </div>
-    <div class="search-panel" id="search-panel">
-      <div class="wrap search-panel__inner">
+    <!-- Search: a full-screen overlay - the page blurs behind a green tint (after cityofbristol.ac.uk). main.js section 3. -->
+    <div class="search-overlay" id="search-panel" role="dialog" aria-modal="true" data-i18n-aria="search.label" aria-label="Search the site" data-lenis-prevent>
+      <button type="button" class="search-overlay__close" data-search-close><span data-i18n="search.close">Close</span><kbd>Esc</kbd></button>
+      <div class="wrap search-overlay__inner">
         <label class="visually-hidden" for="site-search" data-i18n="search.label">Search the site</label>
         <div class="search-field">
-          <svg class="search-field__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
-            <circle cx="11" cy="11" r="7"/>
-            <path d="M16.2 16.2 21 21"/>
-          </svg>
-          <input id="site-search" type="search" autocomplete="off" placeholder="Search products and pages" data-i18n-placeholder="search.placeholder">
+          <svg class="search-field__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.2 16.2 21 21"/></svg>
+          <input id="site-search" type="search" autocomplete="off" spellcheck="false" placeholder="Search products and pages" data-i18n-placeholder="search.placeholder" aria-describedby="search-count">
         </div>
-        <div class="search-results" aria-live="polite"></div>
+        <p class="search-count" id="search-count" aria-live="polite"></p>
+        <div class="search-results"></div>
       </div>
     </div>
   </header>

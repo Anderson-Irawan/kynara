@@ -2,7 +2,7 @@
    KYNARA site behaviour
    1. Language switch (EN / ID)
    2. Rolling hero word
-   3. Mobile menu + search panel
+   3. Mobile menu + search overlay
    4. Collection carousel arrow (Home)
    5. Contact + subscribe forms
    6. Hero parallax (Home)
@@ -276,74 +276,156 @@
     { href: 'contact.html', key: 'nav.contact' }
   ];
   var searchBtn = document.querySelector('.search-toggle');
-  var searchPanel = document.querySelector('.search-panel');
+  var searchPanel = document.querySelector('.search-overlay');
   var searchInput = searchPanel && searchPanel.querySelector('input');
   var searchResults = searchPanel && searchPanel.querySelector('.search-results');
+  var searchCount = searchPanel && searchPanel.querySelector('.search-count');
+  var siteHeader = document.querySelector('.site-header');
+  var SEARCH_ARROW = '<svg class="search-hit__arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="square" aria-hidden="true"><path d="M6 18 18 6M8 6h10v10"/></svg>';
+
+  // An entry is a product when it has a title (its name); its detail is the use line.
+  function searchLabel(item) { return item.title || t(item.key) || ''; }
+  function searchDetail(item) { return item.title ? (item.text || (item.key ? t(item.key) : '') || '') : ''; }
+  function searchHref(item) {
+    var parts = item.href.split('#');
+    return parts[0] + (currentLang === 'en' ? '' : '?lang=' + currentLang) + (parts[1] ? '#' + parts[1] : '');
+  }
+  // The matched part of a label is wrapped in <mark> (underlined, not highlighted)
+  function appendMarked(el, text, q) {
+    var i = q ? text.toLowerCase().indexOf(q) : -1;
+    if (i < 0) { el.appendChild(document.createTextNode(text)); return; }
+    el.appendChild(document.createTextNode(text.slice(0, i)));
+    var m = document.createElement('mark');
+    m.textContent = text.slice(i, i + q.length);
+    el.appendChild(m);
+    el.appendChild(document.createTextNode(text.slice(i + q.length)));
+  }
 
   function renderSearch() {
     if (!searchResults) return;
     var q = (searchInput.value || '').trim().toLowerCase();
     searchResults.innerHTML = '';
-    if (!q) return;
-    var langSuffix = currentLang === 'en' ? '' : '?lang=' + currentLang;
-    var hits = SEARCH_INDEX.filter(function (item) {
-      var hay = ((item.title || '') + ' ' + (t(item.key) || '')).toLowerCase();
-      return hay.indexOf(q) > -1;
-    });
+    searchCount.textContent = '';
+    if (!q) {
+      // Nothing typed yet: every product and page as a quick link, so the panel is never empty
+      [['search.products', true], ['search.pages', false]].forEach(function (g) {
+        var items = SEARCH_INDEX.filter(function (item) { return !!item.title === g[1]; });
+        if (!items.length) return;
+        var group = document.createElement('div');
+        group.className = 'search-quick' + (g[1] ? ' search-quick--products' : '');
+        var label = document.createElement('p');
+        label.className = 'search-quick__label';
+        label.textContent = t(g[0]);
+        var list = document.createElement('div');
+        list.className = 'search-quick__list';
+        items.forEach(function (item) {
+          var a = document.createElement('a');
+          a.className = 'search-quick__link';
+          a.href = searchHref(item);
+          a.textContent = searchLabel(item);
+          list.appendChild(a);
+        });
+        group.appendChild(label);
+        group.appendChild(list);
+        searchResults.appendChild(group);
+      });
+      return;
+    }
+    // Names that start with the query first, then names that contain it, then use lines
+    var hits = SEARCH_INDEX.map(function (item, order) {
+      var label = searchLabel(item), detail = searchDetail(item);
+      var l = label.toLowerCase().indexOf(q), d = detail.toLowerCase().indexOf(q);
+      return { item: item, label: label, detail: detail, order: order, score: l === 0 ? 0 : l > 0 ? 1 : d > -1 ? 2 : -1 };
+    }).filter(function (h) { return h.score > -1; }).sort(function (a, b) { return a.score - b.score || a.order - b.order; });
     if (!hits.length) {
       var p = document.createElement('p');
-      p.textContent = t('search.none');
+      p.className = 'search-empty';
+      p.textContent = t('search.none') + '. ';
+      var contact = SEARCH_INDEX.filter(function (item) { return item.key === 'nav.contact'; })[0];
+      if (contact) {
+        var ask = document.createElement('a');
+        ask.href = searchHref(contact);
+        ask.textContent = t('search.ask');
+        p.appendChild(ask);
+      }
       searchResults.appendChild(p);
       return;
     }
-    hits.forEach(function (item) {
+    searchCount.textContent = t(hits.length === 1 ? 'search.count.one' : 'search.count.many').replace('{n}', hits.length);
+    hits.forEach(function (h) {
       var a = document.createElement('a');
-      var parts = item.href.split('#');
-      a.href = parts[0] + langSuffix + (parts[1] ? '#' + parts[1] : '');
-      a.textContent = item.title || t(item.key);
-      if (item.title && item.key) {
-        var s = document.createElement('span');
-        s.textContent = t(item.key);
-        a.appendChild(s);
+      a.className = 'search-hit' + (h.item.title ? ' search-hit--product' : '');
+      a.href = searchHref(h.item);
+      var name = document.createElement('span');
+      name.className = 'search-hit__name';
+      appendMarked(name, h.label, q);
+      a.appendChild(name);
+      if (h.detail) {
+        var detail = document.createElement('span');
+        detail.className = 'search-hit__detail';
+        appendMarked(detail, h.detail, q);
+        a.appendChild(detail);
       }
+      a.insertAdjacentHTML('beforeend', SEARCH_ARROW);
       searchResults.appendChild(a);
     });
   }
-  var siteHeader = document.querySelector('.site-header');
 
-  var searchClosingTimer = null;
-
+  var searchReturnFocus = null;
+  function isSearchOpen() { return !!searchPanel && searchPanel.classList.contains('is-open'); }
   function setSearch(open) {
+    if (open === isSearchOpen()) return;
     searchPanel.classList.toggle('is-open', open);
     searchBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (!siteHeader) return;
-    // The overlay header (Home, The Brand) takes the cream treatment while the
-    // panel is open, so the bar and the panel read as one surface.
-    siteHeader.classList.toggle('is-search-open', open);
-    // While closing, the bar's colour must wait for the panel to leave. The CSS only
-    // applies that delay under .is-search-closing, so scrolling back to the top
-    // (which also removes the cream) is not held up by it. 800ms comfortably covers
-    // --ui-close-wait + --ui-color-ms.
-    clearTimeout(searchClosingTimer);
-    siteHeader.classList.toggle('is-search-closing', !open);
-    if (!open) {
-      searchClosingTimer = setTimeout(function () {
-        siteHeader.classList.remove('is-search-closing');
-      }, 800);
+    // The page behind stays put while the overlay is open
+    document.documentElement.classList.toggle('is-search-locked', open);
+    if (window.kynaraLenis) { if (open) window.kynaraLenis.stop(); else window.kynaraLenis.start(); }
+    if (open) {
+      searchReturnFocus = document.activeElement;
+      renderSearch();
+      setTimeout(function () { searchInput.focus(); searchInput.select(); }, 30);
+    } else if (searchReturnFocus && searchReturnFocus.focus) {
+      searchReturnFocus.focus();
     }
   }
 
   if (searchBtn && searchPanel) {
-    searchBtn.addEventListener('click', function () {
-      var open = !searchPanel.classList.contains('is-open');
-      setSearch(open);
-      if (open) searchInput.focus();
-    });
+    searchBtn.addEventListener('click', function () { setSearch(!isSearchOpen()); });
     searchInput.addEventListener('input', renderSearch);
+    searchPanel.querySelectorAll('[data-search-close]').forEach(function (b) {
+      b.addEventListener('click', function () { setSearch(false); });
+    });
+    // A click on the blurred page around the content closes it; following a result closes it too
+    searchPanel.addEventListener('click', function (e) {
+      if (e.target === searchPanel || e.target.classList.contains('search-overlay__inner')) setSearch(false);
+      else if (e.target.closest && e.target.closest('.search-results a')) setSearch(false);
+    });
     document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && searchPanel.classList.contains('is-open')) {
-        setSearch(false);
-        searchBtn.focus();
+      if (!isSearchOpen()) {
+        var tag = (e.target && e.target.tagName) || '';
+        var typing = /^(INPUT|TEXTAREA|SELECT)$/.test(tag) || (e.target && e.target.isContentEditable);
+        if ((e.key === 'k' || e.key === 'K') && (e.ctrlKey || e.metaKey)) { e.preventDefault(); setSearch(true); }
+        else if (e.key === '/' && !typing) { e.preventDefault(); setSearch(true); }
+        return;
+      }
+      if (e.key === 'Escape') { e.preventDefault(); setSearch(false); return; }
+      var links = Array.prototype.slice.call(searchResults.querySelectorAll('a'));
+      var at = links.indexOf(document.activeElement);
+      if (e.key === 'ArrowDown' && links.length) {
+        e.preventDefault();
+        (links[at + 1] || links[0]).focus();
+      } else if (e.key === 'ArrowUp' && at > -1) {
+        e.preventDefault();
+        if (at === 0) searchInput.focus(); else links[at - 1].focus();
+      } else if (e.key === 'Enter' && document.activeElement === searchInput && searchInput.value.trim() && links.length) {
+        e.preventDefault();
+        links[0].click();   // Enter opens the top result
+      } else if (e.key === 'Tab') {
+        // Keep focus inside the dialog
+        var f = Array.prototype.slice.call(searchPanel.querySelectorAll('button, input, a[href]'));
+        if (!f.length) return;
+        if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f[f.length - 1].focus(); }
+        else if (!e.shiftKey && document.activeElement === f[f.length - 1]) { e.preventDefault(); f[0].focus(); }
       }
     });
   }
@@ -363,6 +445,33 @@
 
   /* ---------- 5. Forms ---------- */
   var contactForm = document.querySelector('.enquiry-form');
+
+  // After a successful send: the whole screen turns green with a large, centred thank-you,
+  // which lingers ~4s and fades away (a click or Esc dismisses it sooner). The form's own
+  // status line still says "Thank you" for screen readers and once the green has gone.
+  function showThanks() {
+    var done = document.createElement('div');
+    done.className = 'form-done';
+    done.setAttribute('role', 'status');
+    done.innerHTML = '<p class="form-done__title"></p><p class="form-done__body"></p>';
+    done.querySelector('.form-done__title').textContent = t('contact.doneTitle');
+    done.querySelector('.form-done__body').textContent = t('contact.doneBody');
+    document.body.appendChild(done);
+    void done.offsetWidth;   // so the fade-in runs
+    done.classList.add('is-in');
+    var timer;
+    function close() {
+      clearTimeout(timer);
+      document.removeEventListener('keydown', onKey);
+      done.classList.remove('is-in');
+      setTimeout(function () { if (done.parentNode) done.parentNode.removeChild(done); }, 600);
+    }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    done.addEventListener('click', close);
+    document.addEventListener('keydown', onKey);
+    timer = setTimeout(close, 4200);
+  }
+
   if (contactForm) {
     var status = contactForm.querySelector('.form-status');
     contactForm.addEventListener('submit', function (e) {
@@ -376,6 +485,27 @@
       }
       var cfg = CONFIG.contact || {};
       var data = new FormData(contactForm);
+      // EmailJS: the same request their SDK's sendForm() makes, without loading the SDK.
+      // Every field goes to the template by its name: {{name}}, {{company}}, {{email}}, {{product}}, {{message}}.
+      var ejs = cfg.emailjs || {};
+      if (ejs.serviceId && ejs.templateId && ejs.publicKey) {
+        data.append('service_id', ejs.serviceId);
+        data.append('template_id', ejs.templateId);
+        data.append('user_id', ejs.publicKey);
+        status.textContent = t('contact.sending');
+        fetch('https://api.emailjs.com/api/v1.0/email/send-form', { method: 'POST', body: data })
+          .then(function (r) {
+            if (!r.ok) throw new Error(r.status);
+            contactForm.reset();
+            status.textContent = t('contact.sent');
+            showThanks();
+          })
+          .catch(function () {
+            status.textContent = t('contact.fail');
+            status.classList.add('is-error');
+          });
+        return;
+      }
       if (cfg.endpoint) {
         status.textContent = t('contact.sending');
         fetch(cfg.endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } })
@@ -383,6 +513,7 @@
             if (!r.ok) throw new Error(r.status);
             contactForm.reset();
             status.textContent = t('contact.sent');
+            showThanks();
           })
           .catch(function () {
             status.textContent = t('contact.fail');
@@ -394,7 +525,8 @@
       var subject = 'Website enquiry' + (data.get('company') ? ' | ' + data.get('company') : '');
       var body = 'Name: ' + data.get('name') + '\n' +
         'Company: ' + (data.get('company') || '-') + '\n' +
-        'Email: ' + data.get('email') + '\n\n' + data.get('message');
+        'Email: ' + data.get('email') + '\n' +
+        'Product of interest: ' + (data.get('product') || '-') + '\n\n' + data.get('message');
       window.location.href = 'mailto:' + (cfg.email || 'enquiries@kynara.id') +
         '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
       status.textContent = t('contact.mailto');

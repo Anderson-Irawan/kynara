@@ -66,17 +66,17 @@
         <button type="button" class="menu-toggle" aria-expanded="false" data-i18n="nav.menu">MENU</button>
       </div>
     </div>
-    <div class="search-panel" id="search-panel">
-      <div class="wrap search-panel__inner">
+    <!-- Search: a full-screen overlay - the page blurs behind a green tint (after cityofbristol.ac.uk). main.js section 3. -->
+    <div class="search-overlay" id="search-panel" role="dialog" aria-modal="true" data-i18n-aria="search.label" aria-label="Search the site" data-lenis-prevent>
+      <button type="button" class="search-overlay__close" data-search-close><span data-i18n="search.close">Close</span><kbd>Esc</kbd></button>
+      <div class="wrap search-overlay__inner">
         <label class="visually-hidden" for="site-search" data-i18n="search.label">Search the site</label>
         <div class="search-field">
-          <svg class="search-field__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
-            <circle cx="11" cy="11" r="7"/>
-            <path d="M16.2 16.2 21 21"/>
-          </svg>
-          <input id="site-search" type="search" autocomplete="off" placeholder="Search products and pages" data-i18n-placeholder="search.placeholder">
+          <svg class="search-field__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M16.2 16.2 21 21"/></svg>
+          <input id="site-search" type="search" autocomplete="off" spellcheck="false" placeholder="Search products and pages" data-i18n-placeholder="search.placeholder" aria-describedby="search-count">
         </div>
-        <div class="search-results" aria-live="polite"></div>
+        <p class="search-count" id="search-count" aria-live="polite"></p>
+        <div class="search-results"></div>
       </div>
     </div>
   </header>
@@ -85,7 +85,7 @@
     <div class="wrap">
       <h1 class="contact__title" data-i18n="contact.title">Enquire Today</h1>
       <!-- Submission is configured in js/config.js (contact.endpoint) -->
-      <form class="enquiry-form" method="post" enctype="multipart/form-data" novalidate>
+      <form class="enquiry-form" method="post" novalidate>
         <label class="field">
           <span class="field__label" data-i18n="contact.name">Name*</span>
           <input type="text" name="name" autocomplete="name" required placeholder=" ">
@@ -98,13 +98,23 @@
           <span class="field__label" data-i18n="contact.email">Email*</span>
           <input type="email" name="email" autocomplete="email" required placeholder=" ">
         </label>
+        <label class="field field--select">
+          <span class="field__label" data-i18n="contact.product">Product of Interest</span>
+          <select name="product">
+            <option value="" data-i18n="contact.productNone">Select a product</option>
+            <option value="Grove">GROVE</option>
+            <option value="Lattice">LATTICE</option>
+            <option value="Ridge">RIDGE</option>
+            <option value="Ledge">LEDGE</option>
+            <option value="Sapling">SAPLING</option>
+            <option value="Cedar">CEDAR</option>
+            <option value="Aspen">ASPEN</option>
+            <option value="Not sure yet" data-i18n="contact.productUnsure">Not sure yet</option>
+          </select>
+        </label>
         <label class="field">
           <span class="field__label" data-i18n="contact.message">Message*</span>
           <textarea name="message" required placeholder=" "></textarea>
-        </label>
-        <label class="field">
-          <span class="field__label" data-i18n="contact.file">Attach File (if needed)</span>
-          <input type="file" name="attachment" accept=".pdf,.jpg,.jpeg,.png,.dwg,.doc,.docx,.xls,.xlsx,.zip">
         </label>
         <div class="form-actions">
           <button type="submit" class="btn" data-i18n="contact.submit">Send Enquiry</button>

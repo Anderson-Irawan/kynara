@@ -52,10 +52,9 @@
   /* Candara is a wide face, so everything set in it is tracked in by 4% */
   --tracking-display: -0.04em;
 
-  /* The search panel opens in two beats: the bar changes colour, then the field
-     slides down from behind it and fades in. Closing reverses that, and is quicker.
-     --ui-panel-delay is slightly less than --ui-color-ms so the beats hand over
-     smoothly instead of reading as two separate events.
+  /* Motion tokens. (They were made for the old two-beat search drop-down; the search is
+     now a full-screen overlay, 2 Oct, which uses --ui-close-ms / --ui-enter / --ui-exit.
+     --ui-color-ms still times the header bar's colour change.)
 
      Entering and leaving use DIFFERENT curves on purpose. --ui-enter is an
      expo-out: it moves immediately and settles softly. --ui-exit accelerates away.
@@ -126,7 +125,7 @@ html.lenis, html.lenis body { height: auto; }
 /* ---------- Every place Candara is used, tracked in by 4% ---------- */
 .hero__title, .section-title, .story h2, .product-card__name, .product-card__use,
 .feature__title, .stat__value, .contact__title, .subscribe h2, .brand-intro__title,
-.product-tile__name, .product-tile__all, .legal__title, .legal__section h2, .notfound__title {
+.product-tile__name, .product-tile__all, .legal__title, .legal__section h2, .notfound__title, .form-done__title {
   letter-spacing: var(--tracking-display);
 }
 
@@ -375,14 +374,16 @@ html.lenis, html.lenis body { height: auto; }
 .lang-switch__menu button > span,
 .footer-cols a,
 .footer-bottom nav a,
-.notfound__link { position: relative; }   /* the subscribe button is already absolute */
+.notfound__link,
+.search-overlay__close > span { position: relative; }   /* the subscribe button is already absolute */
 .main-nav a > span::after,
 .menu-toggle::after,
 .lang-switch__menu button > span::after,
 .subscribe__field button::after,
 .footer-cols a::after,
 .footer-bottom nav a::after,
-.notfound__link::after {
+.notfound__link::after,
+.search-overlay__close > span::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
   border-top: 1px solid currentColor;
   transform: scaleX(0); transform-origin: right center;
@@ -395,7 +396,8 @@ html.lenis, html.lenis body { height: auto; }
 .subscribe__field button:hover::after,
 .footer-cols a:hover::after,
 .footer-bottom nav a:hover::after,
-.notfound__link:hover::after { transform: scaleX(1); transform-origin: left center; }
+.notfound__link:hover::after,
+.search-overlay__close:hover > span::after { transform: scaleX(1); transform-origin: left center; }
 
 /* The logo changes colour: brand green wherever it sits dark on cream/white, rust over
    the hero photo, where green would disappear into the dark-green gradient. (Rust there
@@ -417,62 +419,88 @@ html.lenis, html.lenis body { height: auto; }
 }
 .circle-btn:hover { background-color: var(--cream); color: var(--green); border-color: var(--cream); }
 
-/* Search panel (see style rule 1). Two beats: the bar changes colour, then the panel
-   slides down from behind it and fades in. Closing reverses that, and is quicker.
-   Each state carries its own transition, with the delay on whichever beat waits.
-
-   It is absolutely positioned and animates ONLY transform and opacity, which the
-   compositor can handle without touching layout. An earlier version animated
-   grid-template-rows so the page below was pushed down instead of overlapped, but
-   track sizing is a layout property: every frame reflowed the panel and, on the
-   light-header pages, the whole document under it. That is what stuttered.
-   **Don't reintroduce a height/grid/max-height animation here.**
-
-   The trade-off is that the open panel now overlays the top of the page instead of
-   pushing it down. That is the usual behaviour for a search drawer and it removes
-   the layout shift entirely. The bar above it is opaque and has a higher z-index,
-   so the panel stays hidden while it is tucked up behind it. */
-.search-panel {
-  position: absolute;
-  top: 100%; left: 0; right: 0;
-  z-index: 1;                      /* under the bar, so it is hidden while tucked up behind it */
-  background: var(--cream); color: var(--ink);
-  transform: translateY(-18px);
-  opacity: 0;
-  visibility: hidden;
-  /* leaving: fade out quickly, lift away, then drop out of the tab order */
-  transition:
-    transform var(--ui-close-ms) var(--ui-exit),
-    opacity var(--ui-fade-ms) var(--ui-exit),
-    visibility 0s linear var(--ui-close-ms);
+/* Search: a full-screen overlay (after cityofbristol.ac.uk, made better). The page blurs
+   behind a see-through --green; a large Candara field sits centred; results appear as you
+   type (the matched part underlined), with every product and page as quick links before
+   anything is typed. It fades in while the content rises into place - opacity and
+   transform only - and is instant under reduced motion. main.js section 3 handles opening,
+   Esc, arrow keys, "/" and Ctrl/Cmd+K, keeping focus inside, and locking the page scroll.
+   Inside the header's stacking context, above the bar, so the bar blurs with the page. */
+.search-overlay {
+  position: fixed; inset: 0; z-index: 5;
+  overflow-y: auto; overscroll-behavior: contain;
+  color: var(--cream);
+  background: rgba(11, 79, 55, .86);   /* --green, see-through so the blurred page shows */
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--ui-close-ms) var(--ui-exit), visibility 0s linear var(--ui-close-ms);
 }
-.search-panel.is-open {
-  transform: translateY(0);
-  opacity: 1;
-  visibility: visible;
-  /* entering: wait for the bar colour, then settle down into place */
-  transition:
-    transform var(--ui-panel-ms) var(--ui-enter) var(--ui-panel-delay),
-    opacity var(--ui-panel-ms) var(--ui-enter) var(--ui-panel-delay),
-    visibility 0s;
+.search-overlay.is-open { opacity: 1; visibility: visible; transition: opacity 260ms var(--ui-enter), visibility 0s; }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .search-overlay { background: var(--green); }   /* no blur available: solid brand green */
 }
-.site-header--overlay .search-panel { border-top: 0; }
-.search-panel__inner { padding-top: 24px; padding-bottom: 24px; }
-/* The magnifier sits inside the field, so the input is padded to clear it */
-.search-field { position: relative; }
-.search-field__icon {
-  position: absolute; left: 18px; top: 50%; transform: translateY(-50%);
-  width: 18px; height: 18px; pointer-events: none;
+html.is-search-locked { overflow: hidden; }
+.search-overlay__close {
+  position: absolute; top: 44px; right: var(--page-pad);
+  display: inline-flex; align-items: center; gap: 12px;
+  font-size: var(--t6); line-height: 1; letter-spacing: .04em; text-transform: uppercase; color: inherit;
 }
-.search-panel input {
-  width: 100%; height: 52px; padding: 0 16px 0 48px;
-  border: 1px solid var(--ink); border-radius: 0; background: transparent;
-  font: 400 var(--t5)/1 var(--font-body); color: var(--ink);
+.search-overlay__close kbd { font: inherit; text-transform: none; padding: 4px 7px; border: 1px solid currentColor; }
+.search-overlay__close:focus-visible { outline: 1px solid currentColor; outline-offset: 6px; }
+.search-overlay__inner {
+  max-width: 920px; margin: 0 auto; padding-top: max(140px, 24vh); padding-bottom: 96px;
+  transform: translateY(20px);
+  transition: transform var(--ui-close-ms) var(--ui-exit);
 }
-.search-results { margin-top: 12px; }
-.search-results a { display: block; padding: 8px 0; border-bottom: 1px solid rgba(0,0,0,.15); }
-.search-results a span { opacity: .55; font-size: var(--t6); margin-left: 10px; }
-.search-results p { padding: 8px 0; opacity: .6; }
+.search-overlay.is-open .search-overlay__inner { transform: none; transition: transform 560ms var(--ui-enter) 40ms; }
+.search-overlay .search-field { position: relative; border-bottom: 1px solid currentColor; }
+.search-overlay .search-field__icon { position: absolute; left: 0; top: calc(50% - 6px); transform: translateY(-50%); width: 34px; height: 34px; pointer-events: none; }   /* inside the field, centred on the text (the field has 18px below it) */
+.search-overlay input {
+  width: 100%; padding: 6px 0 18px 58px; border: 0; border-radius: 0; background: transparent; color: inherit;
+  font: 400 var(--t2)/1.15 var(--font-display); letter-spacing: var(--tracking-display); caret-color: currentColor;
+}
+.search-overlay input::placeholder { color: inherit; opacity: .45; }
+.search-overlay input::-webkit-search-cancel-button { -webkit-appearance: none; }
+.search-overlay input:focus { outline: none; }   /* the field is the only thing focused on open; its rule marks it */
+.search-count { min-height: 1.3em; margin-top: 14px; font-size: var(--t6); letter-spacing: .04em; text-transform: uppercase; opacity: .7; }
+.search-results { margin-top: 10px; }
+.search-overlay mark { background: none; color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .14em; }
+/* A result: name (T3 Candara; products bold, in capitals) - use line - arrow */
+.search-hit {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) 24px; align-items: baseline; gap: 24px;
+  padding: 18px 0; border-bottom: 1px solid rgba(249, 248, 242, .28);
+}
+.search-hit__name { font-family: var(--font-display); font-size: var(--t3); line-height: 1.1; letter-spacing: var(--tracking-display); }
+.search-hit--product .search-hit__name { font-weight: 700; text-transform: uppercase; }
+.search-hit__detail { justify-self: end; text-align: right; font-size: var(--t6); line-height: 1.3; opacity: .8; }
+.search-hit__arrow {
+  grid-column: 3; align-self: center; width: 22px; height: 22px; opacity: 0;
+  transition: opacity var(--hover-ms) var(--ui-enter), translate var(--hover-ms) var(--ui-enter);
+}
+.search-hit:hover .search-hit__arrow, .search-hit:focus-visible .search-hit__arrow { opacity: 1; translate: 3px -3px; }
+.search-hit:focus-visible { outline: none; }
+.search-hit:focus-visible .search-hit__name { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: .14em; }
+/* Before anything is typed: quick links */
+.search-quick { margin-top: 26px; }
+.search-quick__label { font-size: var(--t6); letter-spacing: .04em; text-transform: uppercase; opacity: .7; }
+.search-quick__list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+.search-quick__link {
+  padding: 11px 16px; border: 1px solid currentColor; font-size: var(--t5); line-height: 1;
+  transition: background-color var(--hover-ms) var(--ui-enter), color var(--hover-ms) var(--ui-enter);
+}
+.search-quick--products .search-quick__link { text-transform: uppercase; letter-spacing: .04em; }
+.search-quick__link:hover, .search-quick__link:focus-visible { background: var(--cream); color: var(--green); outline: none; }
+.search-empty { padding-top: 14px; font-size: var(--t5); }
+.search-empty a { text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 900px) {
+  .search-overlay__close { top: 26px; }
+  .search-overlay__inner { padding-top: 104px; }
+  .search-overlay .search-field__icon { width: 24px; height: 24px; }
+  .search-overlay input { padding-left: 40px; }
+  .search-hit { grid-template-columns: minmax(0, 1fr) 22px; row-gap: 6px; }
+  .search-hit__detail { grid-row: 2; justify-self: start; text-align: left; }
+  .search-hit__arrow { grid-column: 2; grid-row: 1; }
+}
 
 /* ==========================================================================
    Hero (Home + The Brand)
@@ -580,7 +608,8 @@ html.lenis, html.lenis body { height: auto; }
   .story__card { transform: none; }
   .story.is-armed .story__card { opacity: 1; translate: none; rotate: none; scale: none; }
   .roller, .roller__word,
-  .search-panel, .search-panel.is-open,
+  .search-overlay, .search-overlay.is-open, .search-overlay__inner, .search-overlay.is-open .search-overlay__inner,
+  .search-hit__arrow, .search-quick__link,
   .site-header--overlay .site-header__bar,
   .site-header__bar::after,
   .main-nav a, .main-nav a > span, .search-toggle, .menu-toggle, .lang-switch__toggle, .lang-switch__menu button,
@@ -609,7 +638,8 @@ html.lenis, html.lenis body { height: auto; }
   --card-w: 422px;
   --end-slot: 2;   /* the last card stops in this slot from the left (1 on phones) */
   display: flex; gap: 34px;
-  margin-top: 22px;
+  margin-top: 6px;      /* 22px, less the 16px of room below */
+  padding: 16px 0 16px 10px; margin-left: -10px; scroll-padding-left: 10px;   /* room for a card to grow on hover without being clipped */
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
@@ -628,11 +658,15 @@ html.lenis, html.lenis body { height: auto; }
 /* Each product is a spec-sheet card (after Anderson's "001. stack" reference): number
    and name above a rule, the photo edge to edge, the Use row (when there is one) with
    a rule under it, then the arrow. The whole card is the link; no underline. Hover
-   nudges the arrow the way it points - no lift. Cards stretch to the tallest, so the
+   nudges the arrow the way it points, and the card grows 3% (Anderson asked, 2 Oct). Cards stretch to the tallest, so the
    arrows line up even when a card has no Use row. */
 .product-tile {
   flex: 1; display: flex; flex-direction: column; background: var(--cream); color: var(--ink);
   border-radius: 46px; overflow: hidden;   /* same rounding as the Products page cards (32px on phones) */
+  transition: scale var(--hover-ms) var(--ui-enter);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .product-tile:hover { scale: 1.03; }
 }
 .product-tile__head {
   display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
@@ -653,7 +687,7 @@ html.lenis, html.lenis body { height: auto; }
 .product-tile__arrow { width: 28px; height: 28px; transition: translate var(--hover-ms) var(--ui-enter); }
 .product-tile:hover .product-tile__arrow { translate: 3px -3px; }
 .product-tile:focus-visible { outline: 1px solid var(--cream); outline-offset: 4px; }   /* follows the rounding */   /* on the green section */
-.collection__controls { display: flex; justify-content: flex-end; margin-top: 18px; }
+.collection__controls { display: flex; justify-content: flex-end; margin-top: 2px; }   /* 18px, less the track's 16px of room */
 
 .circle-btn {
   display: inline-flex; align-items: center; justify-content: center; text-align: center;
@@ -827,13 +861,36 @@ li.pick__row--plain { grid-template-columns: 1fr; }
 .enquiry-form { margin: 26px auto 0; max-width: 767px; }
 .field { display: block; margin-bottom: 14px; }
 .field__label { display: block; font-size: var(--t6); line-height: 1; margin-bottom: 9px; }
-.field input, .field textarea {
+.field input, .field textarea, .field select {
   display: block; width: 100%; height: 52px; padding: 0 14px;
   border: 1px solid var(--ink); border-radius: 0; background: transparent;
   font: 400 var(--t5)/1.4 var(--font-body); color: var(--ink);
   -webkit-appearance: none; appearance: none;
 }
 .field textarea { height: 122px; padding: 12px 14px; resize: vertical; }
+/* Sent: the screen turns --green with a large centred thank-you (main.js showThanks). It
+   fades in, lingers ~4s and fades out; a click or Esc closes it sooner. Above everything,
+   header included. Under reduced motion it appears and goes without fading. */
+.form-done {
+  position: fixed; inset: 0; z-index: 40;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px;
+  padding: 0 var(--page-pad); text-align: center; cursor: pointer;
+  background: var(--green); color: var(--cream);
+  opacity: 0; transition: opacity 500ms var(--ui-exit);
+}
+.form-done.is-in { opacity: 1; transition: opacity 450ms var(--ui-enter); }
+.form-done__title { font-family: var(--font-display); font-size: var(--t1); line-height: 1.05; }
+.form-done__body { font-size: var(--t4); line-height: 1.35; }
+.form-done p { transform: translateY(14px); transition: transform 500ms var(--ui-exit); }
+.form-done.is-in p { transform: none; transition: transform 700ms var(--ui-enter) 80ms; }
+@media (prefers-reduced-motion: reduce) { .form-done, .form-done.is-in, .form-done p, .form-done.is-in p { transition: none; transform: none; } }
+/* Dropdown (Product of Interest): the same square field, with a thin chevron drawn on the right */
+.field--select { position: relative; }
+.field select { padding-right: 44px; cursor: pointer; }
+.field--select::after {
+  content: ""; position: absolute; right: 19px; bottom: 23px; width: 8px; height: 8px;
+  border-right: 1px solid var(--ink); border-bottom: 1px solid var(--ink); transform: rotate(45deg); pointer-events: none;
+}
 .field input[type="file"] { padding: 0 14px; line-height: 50px; font-size: var(--t6); }
 .field input[type="file"]::file-selector-button {
   margin-right: 14px; padding: 6px 14px;

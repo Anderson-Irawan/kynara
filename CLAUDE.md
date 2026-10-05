@@ -80,10 +80,9 @@ fonts/                Candara (display) + DM Sans (body), loaded with @font-face
    restoring the original rule** — each item was requested:
    - the rolling word in the hero,
    - the carousel's native smooth scroll,
-   - **the search panel opening**, in two beats — the bar changes colour (`--ui-color-ms`), *then* the panel
-     slides down and fades in (`--ui-panel-ms`). Closing reverses the order. Each state carries its own
-     `transition` with a delay on whichever beat should wait; that is why the rules look duplicated.
-     **Animate only `transform` and `opacity` here** — see the Done notes for why a height animation stuttered.
+   - **the search overlay opening** (2 Oct) — the full-screen overlay fades in (260ms) while its content rises 20px
+     into place (560ms, `--ui-enter`); closing is quicker on `--ui-exit`. **Opacity and transform only.** It replaced
+     the old two-beat drop-down panel (see Done, October).
    - **the Home hero video** — a muted, seamlessly looping background (`videos/hero.mp4`), started by main.js.
    - **parallax on the Home hero** — `.hero--parallax`, driven from main.js.
    - **the Home story cards landing** — once, when the story is a quarter on screen, the two cards are "laid down"
@@ -112,8 +111,16 @@ fonts/                Candara (display) + DM Sans (body), loaded with @font-face
      cream bar; cream fill + green over the Home hero). The logo and the footer icons change colour (green;
      the logo goes rust over the hero). The circle buttons invert to a cream fill with green text/icon.
      Colour, underline and fill only — still no lifts, scales or shadows.
+   - **the Home carousel cards growing on hover** — 3% (`scale`, on the `--hover-ms` rhythm), asked for by Anderson
+     (2 Oct). Like the story tilt, an exception to "no hover lifts" — don't spread it to other cards without asking.
+     Real pointers only, off under reduced motion. The track carries 16px / 10px of padding (cancelled by margins)
+     so the grown card isn't clipped by the scroller.
    - **the footer shapes drifting** — irregular outlines with softened corners (1px `--green`, no fill) sliding slowly sideways
      behind every footer, after vestre.com's footer (`.footer-shapes`, see Done). Still under reduced motion.
+   - **the green "thank you" after an enquiry is sent** (5 Oct, Anderson) — the screen turns `--green` with a large
+     centred "Thank you." (Candara T1) and "We'll be in touch shortly." (T4), fading in, lingering ~4s and fading
+     out; a click or Esc closes it sooner (`.form-done`, built by main.js `showThanks()`). Keys `contact.doneTitle` /
+     `contact.doneBody`. Instant under reduced motion.
    - **the contact button extending on hover** — the rounded square opens leftwards into a rounded rectangle reading
      "Request a quote or get in touch", the chat bubble travelling with the left edge (`.chat-fab`, see Done).
      A width change on the button itself, not a scale.
@@ -246,9 +253,19 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
 - Where ID text runs longer, check the layout at 1280px and 390px. There is no longer an ID hero size override: the hero is English in both languages, so it cannot overflow its `white-space: nowrap`.
 
 ## Forms
-- **Contact** (`contact.html`): Name*, Company Name, Email*, Message*, Attach File. Validation uses the browser's built-in checks.
-  Submission is set in `js/config.js → contact.endpoint`. While that is empty, the form opens the visitor's email app pre-filled to `enquiries@kynara.id`, and attachments can't travel that way.
-  To finish this, connect a form service (Formspree, Netlify Forms, Basin, or a PHP mailer on the host) and put its URL in `endpoint`. The form already posts `multipart/form-data` including the file.
+- **Contact** (`contact.html`): Name*, Company Name, Email*, **Product of Interest** (optional dropdown, 5 Oct: "Select a
+  product", the seven products in capitals, "Not sure yet"; `name="product"`; the theme lists the live products), Message*. **The Attach File field was removed (5 Oct)** —
+  EmailJS attachments need a paid plan and Anderson chose to keep it simple; people with drawings email them. Validation uses the browser's built-in checks.
+  Submission is set in `js/config.js → contact.endpoint`. While that is empty, the form opens the visitor's email app pre-filled to `enquiries@kynara.id`.
+  To finish this, connect a form service (Formspree, Netlify Forms, Basin, or a PHP mailer on the host) and put its URL in `endpoint`. 
+- **EmailJS is built in (5 Oct).** Fill `contact.emailjs` in `js/config.js` (and the theme's copy) — `serviceId`,
+  `templateId`, `publicKey` — and the form sends through EmailJS's REST `send-form` endpoint (the request their SDK's
+  `sendForm()` makes; no SDK is loaded). Priority: EmailJS → `endpoint` → email-app fallback. Fields reach the
+  template by name: `{{name}}`, `{{company}}`, `{{email}}`, `{{product}}`, `{{message}}`. Setup: EmailJS → Email Services
+  (connect enquiries@kynara.id's mailbox) → Email Templates (To: enquiries@kynara.id, Reply-To: `{{email}}`, body
+  with the five variables) → Account → Security:
+  restrict to kynara.id. Tested 5 Oct with dummy IDs and an intercepted request (right URL, all fields + IDs; form resets
+  and thanks on success) — not yet against a real EmailJS account.
 - **Subscribe** (footer, all pages): set `subscribe.endpoint` in config.js (Mailchimp or Brevo). For now it only shows a thank-you message.
 - The designs had no submit buttons, so "[ Send Enquiry ]" and a small "SUBSCRIBE" text button were added in the
   bracket style. **Send Enquiry is now a solid button** (`.btn`, 28 Sep — Anderson said it read as a link): green fill,
@@ -329,7 +346,7 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
 - Two typos from the drafts were corrected: "Craftsmenship" → "Craftsmanship" and "post-customer" → "post-consumer".
 - Image mapping: Home hero = **video** `videos/hero.mp4` with poster `images/hero-poster.webp` (see Done; the old hero photo `hero-cosmos_1160439100.webp` is no longer used on Home), The Brand banner = `images/brand-banner.webp` (see Done; `kids in forest` is no longer used); Craftsmanship = `meeting ith forest.jpeg`; Sustainable = `cosmos_789092184.jpeg`; Limitless Applications = `cosmos_969656075.jpeg`.
 - The file names contain spaces, so they are URL-encoded in the HTML (`%20`). If you rename images, update the paths.
-- SEARCH opens a simple panel that filters a small index in main.js (`SEARCH_INDEX`). Add new pages or products to that index.
+- SEARCH opens a full-screen overlay that filters a small index in main.js (`SEARCH_INDEX`; in WordPress built from the admin). Add new pages or products to that index.
 - Breakpoints: 1180px (tightens the grids) and 900px (mobile: MENU toggle, everything stacks), plus 520px.
 
 ## Before launch
@@ -341,6 +358,22 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   replaced it is 1440px wide; on very large screens (container over ~1440px) it will soften slightly.
 
 ### Done (October 2026)
+- **Search is a full-screen overlay (2 Oct)**, after cityofbristol.ac.uk ("make it better"). `.search-overlay` (still
+  `id="search-panel"`, inside the header in all six pages + header.php): the page **blurs** (`backdrop-filter: blur(14px)`)
+  behind a see-through `--green` (solid green where blur isn't supported); a large **Candara T2 field**, centred
+  (920px column), with a 1px cream rule and the magnifier inside; **Close + Esc** top right. Better than Bristol:
+  - **live results** as you type — name (T3; products bold, in capitals) · use line · arrow that appears on
+    hover/focus; the matched part is **underlined** (`<mark>`), ranked starts-with → contains → use line; a result count;
+  - **quick links before typing** — every product, then every page, as outlined chips (from `SEARCH_INDEX`, so
+    WordPress shows the live products);
+  - **no results** → "No results. Ask us directly" linking to Contact;
+  - **keyboard**: Esc closes, ↓/↑ move through results, Enter opens the top result, Tab stays inside the dialog,
+    **"/" or Ctrl/Cmd+K opens it** from anywhere; focus returns to the search button on close;
+  - clicking the blurred page closes it; the page behind is **scroll-locked** (`html.is-search-locked` + Lenis stopped;
+    the overlay itself scrolls, `data-lenis-prevent`).
+  Keys: `search.close`, `search.products`, `search.pages`, `search.count.one` / `.many` (`{n}`), `search.ask`.
+  Tested in real Chrome (via the DevTools protocol, not virtual time): open/typing/ranking/arrow keys/no-results/Esc/
+  focus return/Ctrl+K, at 1280px and 390px.
 - **Footer shapes (after vestre.com's footer).** Behind every footer, a band of shapes drifts slowly left
   (`.footer-shapes`, 140s per loop): **irregular polygons — notches, odd angles — with every corner rounded off (radius 28 in
   tile units), as 1px `--green` strokes with no fill**. One 2400×800 SVG tile is drawn twice in `.footer-shapes__track`, which slides
@@ -412,6 +445,9 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   rather than 72px, and it keeps growing with the viewport since the page is full-bleed.
 - **Burgundy circle removed** from the Home hero, markup and CSS both (it only ever appeared on `index.html`).
   If it is ever wanted back it was a 184px `--rust` circle, 578px down, inset by the page padding.
+- ~~Search panel~~ — **replaced on 2 Oct by the full-screen search overlay** (see Done, October). The history below
+  is kept because its lessons still apply (animate only transform/opacity; separate enter/exit curves). The header's
+  `.is-search-open` / `.is-search-closing` CSS is now inert — main.js no longer sets those classes.
 - **Search panel animates open** in two beats, and the overlay header fades to cream with it, logo
   cross-fading — see style rule 1. The panel is `position: absolute` under the bar and animates **only
   `transform` and `opacity`**; a delayed `visibility` keeps the closed panel out of the tab order. The bar is
@@ -472,7 +508,8 @@ opens. The markup is just the link with a visually-hidden "KYNARA" (fallback if 
   via `text-transform`, 1 Oct — the HTML/admin keep "Grove") over a 1px ink rule. **The "01." numbers were removed at
   Anderson's request (1 Oct)** — don't add them back; the photo edge to edge with a rule under it; a **Use** row
   (T6, label left, value right, rule under) only when the product has a use line; then the squared 45° arrow, bottom
-  right. **The whole card is the link, with no underline**; hover nudges the arrow 3px the way it points. Cards stretch
+  right. **The whole card is the link, with no underline**; hover nudges the arrow 3px the way it points and grows the
+  card 3% (2 Oct — see the motion list). Cards stretch
   to the tallest (`.collection__item` is flex), so the arrows line up — a card with no Use row shows a blank band there
   until its use line is supplied. A Material row and a small KYNARA logo in the foot were tried and **removed at
   Anderson's request** — don't add them back. Rounded like the Products page cards (46px / 32px on phones, at Anderson's request), with

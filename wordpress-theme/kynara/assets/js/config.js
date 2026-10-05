@@ -15,11 +15,18 @@ window.KYNARA_CONFIG = {
     words: ['Living', 'Working', 'Dining', 'Playing', 'Meetings', 'Sleeping']
   },
 
-  /* Contact form. Leave endpoint empty to fall back to opening the visitor's email app
-     (note: attachments cannot be carried over by the email-app fallback).
-     Set endpoint to a form service URL (e.g. Formspree / Netlify Forms / your own PHP)
-     to post the form, including the attached file, directly. */
+  /* Contact form: name, company, email, message (no file upload). Leave endpoint empty to
+     fall back to opening the visitor's email app; set it to a form service URL (e.g.
+     Formspree / Netlify Forms / your own PHP) to post the form directly. */
   contact: {
+    /* EmailJS (emailjs.com): paste the three IDs from your EmailJS dashboard and the form
+       sends through it - see "Forms" in CLAUDE.md for the setup steps. Leave them empty to
+       use endpoint below instead, or, with both empty, the visitor's email app. */
+    emailjs: {
+      serviceId: 'service_kynara',    // Email Services -> your service, e.g. 'service_ab12cd3'
+      templateId: 'template_kynara-enquire',   // Email Templates -> your template, e.g. 'template_xy98zw7'
+      publicKey: 'xTCYns-tkTwus0yWX'     // Account -> General -> Public Key
+    },
     endpoint: '',
     email: 'enquiries@kynara.id'
   },

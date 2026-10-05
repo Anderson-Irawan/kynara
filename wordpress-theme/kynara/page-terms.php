@@ -12,7 +12,7 @@ get_header();
 			<p class="legal__updated" data-i18n="terms.updated">Last updated: 1 October 2026</p>
 			<section class="legal__section">
 				<h2 data-i18n="terms.s1.title">1. Scope</h2>
-				<p data-i18n="terms.s1.body">These terms apply when you use kynara.id, including our product information, enquiry and quote requests, file uploads and newsletter sign-up.</p>
+				<p data-i18n="terms.s1.body">These terms apply when you use kynara.id, including our product information, enquiry and quote requests, and newsletter sign-up.</p>
 			</section>
 			<section class="legal__section">
 				<h2 data-i18n="terms.s2.title">2. Enquiries and quotes</h2>
@@ -24,7 +24,7 @@ get_header();
 			</section>
 			<section class="legal__section">
 				<h2 data-i18n="terms.s4.title">4. Acceptable use</h2>
-				<p data-i18n="terms.s4.body">Do not interfere with the website, attempt unauthorised access, upload harmful files through our forms, or use the website in a way that is unlawful, misleading or harmful to KYNARA or others.</p>
+				<p data-i18n="terms.s4.body">Do not interfere with the website, attempt unauthorised access, send harmful content through our forms, or use the website in a way that is unlawful, misleading or harmful to KYNARA or others.</p>
 			</section>
 			<section class="legal__section">
 				<h2 data-i18n="terms.s5.title">5. Accuracy and availability</h2>

@@ -9,7 +9,7 @@ get_header();
 	<main class="contact">
 		<div class="wrap">
 			<h1 class="contact__title" data-i18n="contact.title">Enquire Today</h1>
-			<form class="enquiry-form" method="post" enctype="multipart/form-data" novalidate>
+			<form class="enquiry-form" method="post" novalidate>
 				<label class="field">
 					<span class="field__label" data-i18n="contact.name">Name*</span>
 					<input type="text" name="name" autocomplete="name" required placeholder=" ">
@@ -22,13 +22,19 @@ get_header();
 					<span class="field__label" data-i18n="contact.email">Email*</span>
 					<input type="email" name="email" autocomplete="email" required placeholder=" ">
 				</label>
+				<label class="field field--select">
+					<span class="field__label" data-i18n="contact.product">Product of Interest</span>
+					<select name="product">
+						<option value="" data-i18n="contact.productNone">Select a product</option>
+						<?php foreach ( kynara_get_products() as $kynara_p ) : ?>
+							<option value="<?php echo esc_attr( get_the_title( $kynara_p ) ); ?>"><?php echo esc_html( strtoupper( get_the_title( $kynara_p ) ) ); ?></option>
+						<?php endforeach; ?>
+						<option value="Not sure yet" data-i18n="contact.productUnsure">Not sure yet</option>
+					</select>
+				</label>
 				<label class="field">
 					<span class="field__label" data-i18n="contact.message">Message*</span>
 					<textarea name="message" required placeholder=" "></textarea>
-				</label>
-				<label class="field">
-					<span class="field__label" data-i18n="contact.file">Attach File (if needed)</span>
-					<input type="file" name="attachment" accept=".pdf,.jpg,.jpeg,.png,.dwg,.doc,.docx,.xls,.xlsx,.zip">
 				</label>
 				<div class="form-actions">
 					<button type="submit" class="btn" data-i18n="contact.submit">Send Enquiry</button>
